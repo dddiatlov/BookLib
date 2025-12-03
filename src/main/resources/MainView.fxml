@@ -22,7 +22,7 @@
             <Button fx:id="addBookButton"
                     text="+ Add Book"
                     onAction="#onAddBook"
-                    style="-fx-font-size: 16px; -fx-background-radius: 10; -fx-padding: 8 20;" />
+                    style="-fx-font-size: 16px; -fx-background-radius: 10; -fx-padding: 8 20;"/>
 
             <Button fx:id="profileButton"
                     text="Profile"
