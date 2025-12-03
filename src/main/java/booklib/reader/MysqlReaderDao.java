@@ -1,6 +1,4 @@
 package booklib.reader;
-
-import booklib.entities.Reader;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -35,15 +33,13 @@ public class MysqlReaderDao implements ReaderDao {
         var numLoaded = memoryDao.loadFromCsv(file);
         var readers = memoryDao.findAll();
 
-        for (var reader : readers) {
-            jdbcOperations.update(
+        readers.forEach(reader -> jdbcOperations.update(
                 "INSERT INTO reader (id, name, password_hash, created_at) VALUES (?, ?, ?, ?)",
                 reader.getId(),
                 reader.getName(),
                 reader.getPasswordHash(),
                 reader.getCreatedAt()
-            );
-        }
+        ));
 
         return numLoaded;
     }

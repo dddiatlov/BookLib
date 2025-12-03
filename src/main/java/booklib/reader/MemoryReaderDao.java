@@ -1,7 +1,4 @@
 package booklib.reader;
-
-import booklib.entities.Reader;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
