@@ -1,4 +1,4 @@
-package booklib.reader;
+package booklib.readers;
 
 import lombok.Data;
 

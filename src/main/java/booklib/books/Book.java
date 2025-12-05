@@ -1,4 +1,4 @@
-package booklib.book;
+package booklib.books;
 
 import lombok.Data;
 

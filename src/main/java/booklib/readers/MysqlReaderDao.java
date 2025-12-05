@@ -1,4 +1,5 @@
-package booklib.reader;
+package booklib.readers;
+
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.ResultSetExtractor;
 

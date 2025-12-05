@@ -1,7 +1,7 @@
-package booklib.book;
+package booklib.books;
+
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.ResultSetExtractor;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
