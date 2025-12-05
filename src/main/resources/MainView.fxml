@@ -9,7 +9,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="booklib.MainController"
+            fx:controller="booklib.Controller"
             prefWidth="900" prefHeight="600">
 
     <!-- Левая панель -->

@@ -4,28 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="init">
-      <change afterPath="$PROJECT_DIR$/init.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/Controller.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/Factory.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/exceptions/NotFoundException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/MysqlReadingSessionDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSession.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="Kyryl's modifications">
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/book/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/Book.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/book/BookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/BookDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/book/MemoryBookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/MemoryBookDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/book/MysqlBookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/MysqlBookDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/reader/MemoryReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/MemoryReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/reader/MysqlReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/MysqlReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/reader/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/Reader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/reader/ReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/ReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/org/example/booklib/hello-view.fxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/MainController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/MemoryBookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/MemoryBookDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/MemoryReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/MemoryReaderDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/MainView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/MainView.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +38,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/dddiatlov/BookLib.git&quot;,
-    &quot;accountId&quot;: &quot;da7f7a86-0fa3-43b3-8a70-2a7afacc2d8d&quot;
+    &quot;accountId&quot;: &quot;6a68dd36-cf5c-46ca-85d2-296340fc09b0&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -64,29 +49,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Banan/IdeaProjects/BookLib",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Banan/IdeaProjects/BookLib&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -109,7 +94,8 @@
       <workItem from="1764781821809" duration="1741000" />
       <workItem from="1764783632710" duration="1176000" />
       <workItem from="1764949222302" duration="692000" />
-      <workItem from="1764950220617" duration="1865000" />
+      <workItem from="1764950220617" duration="1981000" />
+      <workItem from="1764952475904" duration="308000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -127,7 +113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764783231152</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Kyryl's modifications">
+      <option name="closed" value="true" />
+      <created>1764952131213</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1764952131213</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -146,6 +140,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="init" />
-    <option name="LAST_COMMIT_MESSAGE" value="init" />
+    <MESSAGE value="Kyryl's modifications" />
+    <option name="LAST_COMMIT_MESSAGE" value="Kyryl's modifications" />
   </component>
 </project>
