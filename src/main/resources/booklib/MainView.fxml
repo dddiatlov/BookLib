@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="booklib.Controller">
+
+    <!-- Заголовок сверху -->
+    <top>
+        <Label text="Reading sessions"
+               BorderPane.alignment="CENTER"
+               style="-fx-font-size: 20px; -fx-padding: 10;"/>
+    </top>
+
+    <!-- Левая панель: Add Book -->
+    <left>
+        <VBox spacing="10"
+              alignment="TOP_CENTER"
+              BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <Button fx:id="addBookButton"
+                    text="+ Add Book"
+                    onAction="#onAddBook"
+                    style="-fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 6 14;"/>
+        </VBox>
+    </left>
+
+    <!-- Центр: список ReadingSession -->
+    <center>
+        <ListView fx:id="sessionsListView"
+                  onMouseClicked="#sessionsListViewMouseClicked"
+                  BorderPane.alignment="CENTER"
+                  prefWidth="500"
+                  prefHeight="400"/>
+    </center>
+
+    <!-- Правая панель: кнопки управления сессиями -->
+    <right>
+        <VBox spacing="10"
+              alignment="TOP_CENTER"
+              BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <Button fx:id="addSessionButton"
+                    text="New session"
+                    onAction="#addSessionButtonAction"
+                    maxWidth="Infinity"/>
+
+            <Button fx:id="deleteSessionButton"
+                    text="Delete session"
+                    onAction="#deleteSessionButtonAction"
+                    maxWidth="Infinity"/>
+        </VBox>
+    </right>
+
+</BorderPane>
