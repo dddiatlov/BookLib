@@ -9,4 +9,3 @@ public class IDELauncher {
         System.out.println("System ready. Type commands or open GUI...");
     }
 }
-

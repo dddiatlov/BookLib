@@ -9,7 +9,8 @@ import javafx.stage.Stage;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        var loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
+        var fxml = getClass().getResource("/booklib/MainView.fxml");
+        var loader = new FXMLLoader(fxml);
         Parent rootPane = loader.load();
 
         var scene = new Scene(rootPane);
