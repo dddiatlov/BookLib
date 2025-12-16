@@ -3,8 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
@@ -13,68 +15,40 @@
             prefWidth="900"
             prefHeight="600">
 
-    <!-- LEFT PANEL -->
-    <left>
-        <VBox spacing="20"
-              alignment="TOP_CENTER"
-              BorderPane.alignment="CENTER">
+    <top>
+        <HBox spacing="10" style="-fx-padding: 12; -fx-background-color: #2c3e50;">
+            <Label text="BookLib" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+        </HBox>
+    </top>
 
-            <padding>
-                <Insets top="30" right="10" bottom="10" left="20"/>
-            </padding>
-
-            <Button fx:id="addBookButton"
-                    text="+ Add Book"
-                    onAction="#onAddBook"
-                    style="-fx-font-size: 16px;
-                           -fx-background-radius: 10;
-                           -fx-padding: 8 20;"/>
-
-            <Button fx:id="profileButton"
-                    text="Profile"
-                    style="-fx-background-radius: 25;
-                           -fx-padding: 10 25;
-                           -fx-font-size: 14px;"/>
-
-            <Button fx:id="goalButton"
-                    text="Goal"
-                    style="-fx-background-radius: 25;
-                           -fx-padding: 10 25;
-                           -fx-font-size: 14px;"/>
-        </VBox>
-    </left>
-
-    <!-- CENTER CONTENT -->
     <center>
-        <VBox spacing="10"
-              BorderPane.alignment="CENTER">
+        <HBox spacing="12" style="-fx-padding: 12; -fx-background-color: #f3f3f3;">
 
-            <padding>
-                <Insets top="20" right="30" bottom="20" left="10"/>
-            </padding>
+            <!-- LEFT: My Books -->
+            <VBox spacing="10" prefWidth="520">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label fx:id="myBooksLabel" text="My Books" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Button fx:id="addBookButton" text="+ Add Book" onAction="#onAddBook"/>
+                </HBox>
 
-            <!-- TITLE -->
-            <Label fx:id="myBooksLabel"
-                   text="My Books"
-                   style="-fx-font-size: 20px;
-                          -fx-font-weight: bold;"/>
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox fx:id="booksContainer"
+                              spacing="15"
+                              style="-fx-background-color: #f9f9f9; -fx-padding: 10;">
+                            <!-- book cards added programmatically -->
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </VBox>
 
-            <!-- SCROLLABLE BOOK LIST -->
-            <ScrollPane fitToWidth="true"
-                        fitToHeight="true"
-                        prefHeight="500">
+            <!-- RIGHT: Reading Sessions -->
+            <VBox spacing="10" prefWidth="340">
+                <Label text="Reading Sessions" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <ListView fx:id="readingSessionsListView" VBox.vgrow="ALWAYS"/>
+            </VBox>
 
-                <content>
-                    <VBox fx:id="booksContainer"
-                          spacing="15"
-                          style="-fx-background-color: #f9f9f9;
-                                 -fx-padding: 10;">
-                        <!-- book cards added programmatically -->
-                    </VBox>
-                </content>
-
-            </ScrollPane>
-        </VBox>
+        </HBox>
     </center>
 
 </BorderPane>

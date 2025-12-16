@@ -2,7 +2,10 @@ package booklib.books;
 
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.ResultSetExtractor;
+
 import java.io.File;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,15 +17,13 @@ public class MysqlBookDao implements BookDao {
         var books = new ArrayList<Book>();
         while (rs.next()) {
             var book = Book.fromResultSet(rs);
-            if (book != null) {
-                books.add(book);
-            }
+            if (book != null) books.add(book);
         }
         return books;
     };
 
     private static final String SELECT_ALL =
-            "SELECT id, title, pages, genre, language, created_at FROM book";
+            "SELECT id, title, author, pages, genre, language, created_at FROM book";
 
     public MysqlBookDao(JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
@@ -35,18 +36,36 @@ public class MysqlBookDao implements BookDao {
 
         for (var book : memoryDao.findAll()) {
             jdbcOperations.update(
-                "INSERT INTO book (id, title, pages, genre, language, created_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?)",
-                book.getId(),
+                    "INSERT INTO book (id, title, author, pages, genre, language, created_at) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                            "ON DUPLICATE KEY UPDATE " +
+                            "title=VALUES(title), author=VALUES(author), pages=VALUES(pages), " +
+                            "genre=VALUES(genre), language=VALUES(language), created_at=VALUES(created_at)",
+                    book.getId(),
+                    book.getTitle(),
+                    book.getAuthor(),
+                    book.getPages(),
+                    book.getGenre(),
+                    book.getLanguage(),
+                    Timestamp.valueOf(book.getCreatedAt() != null ? book.getCreatedAt() : LocalDateTime.now())
+            );
+        }
+        return loaded;
+    }
+
+    @Override
+    public void add(Book book) {
+        if (book == null) throw new IllegalArgumentException("Book is null");
+
+        jdbcOperations.update(
+                "INSERT INTO book (title, author, pages, genre, language, created_at) VALUES (?, ?, ?, ?, ?, ?)",
                 book.getTitle(),
+                book.getAuthor(),
                 book.getPages(),
                 book.getGenre(),
                 book.getLanguage(),
-                book.getCreatedAt()
-            );
-        }
-
-        return loaded;
+                Timestamp.valueOf(book.getCreatedAt() != null ? book.getCreatedAt() : LocalDateTime.now())
+        );
     }
 
     @Override
@@ -56,28 +75,47 @@ public class MysqlBookDao implements BookDao {
 
     @Override
     public Book findById(Long id) {
-        String sql = "SELECT id, title, pages, genre, language, created_at FROM book WHERE id = ?";
-        var list = jdbcOperations.query(sql, bookExtractor, id);
+        var list = jdbcOperations.query(
+                "SELECT id, title, author, pages, genre, language, created_at FROM book WHERE id = ?",
+                bookExtractor,
+                id
+        );
         return list.isEmpty() ? null : list.get(0);
     }
 
     @Override
     public List<Book> findByReaderId(Long readerId) {
         String sql =
-            "SELECT b.id, b.title, b.pages, b.genre, b.language, b.created_at " +
-            "FROM book b " +
-            "JOIN book_status bs ON bs.book_id = b.id " +
-            "WHERE bs.reader_id = ?";
+                "SELECT " +
+                        "b.id, b.title, b.author, b.pages, b.genre, b.language, b.created_at, " +
+                        "bs.status AS bs_status " +
+                        "FROM book b " +
+                        "JOIN book_status bs ON bs.book_id = b.id " +
+                        "WHERE bs.reader_id = ? " +
+                        "ORDER BY bs.created_at DESC";
 
-        return jdbcOperations.query(sql, bookExtractor, readerId);
+        return jdbcOperations.query(sql, (rs, rowNum) -> {
+            Book book = Book.fromResultSet(rs);     // reads book columns
+            book.setStatus(rs.getString("bs_status")); // reads status explicitly
+            return book;
+        }, readerId);
     }
 
     @Override
     public void addBookForReader(Long bookId, Long readerId, String status) {
-        String sql =
-            "INSERT INTO book_status (book_id, reader_id, status, created_at) " +
-            "VALUES (?, ?, ?, NOW())";
+        jdbcOperations.update(
+                "INSERT INTO book_status (book_id, reader_id, status, created_at) " +
+                        "VALUES (?, ?, ?, NOW()) " +
+                        "ON DUPLICATE KEY UPDATE status=VALUES(status)",
+                bookId, readerId, status
+        );
+    }
 
-        jdbcOperations.update(sql, bookId, readerId, status);
+    @Override
+    public void removeBookForReader(Long bookId, Long readerId) {
+        jdbcOperations.update(
+                "DELETE FROM book_status WHERE book_id = ? AND reader_id = ?",
+                bookId, readerId
+        );
     }
 }
