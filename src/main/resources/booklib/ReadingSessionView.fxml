@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="booklib.readingSessions.ReadingSessionController">
+
+    <padding>
+        <Insets top="15" right="15" bottom="15" left="15"/>
+    </padding>
+
+    <Label fx:id="bookLabel"
+           text="Book"
+           style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+    <TextField fx:id="pagesReadField" promptText="Pages read"/>
+    <TextField fx:id="durationField" promptText="Duration (minutes)"/>
+    <DatePicker fx:id="datePicker"/>
+
+    <HBox spacing="10">
+        <Button fx:id="saveButton" text="Save" onAction="#onSave"/>
+        <Button fx:id="cancelButton" text="Cancel" onAction="#onCancel"/>
+    </HBox>
+
+</VBox>

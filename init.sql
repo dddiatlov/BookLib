@@ -25,6 +25,12 @@ CREATE TABLE IF NOT EXISTS `bookLib`.`reader` (
     PRIMARY KEY (`id`))
     ENGINE = InnoDB;
 
+INSERT INTO `bookLib`.`reader` (`id`, `name`, `password_hash`)
+VALUES (1, 'Default Reader', 'dev')
+    ON DUPLICATE KEY UPDATE
+                         `name` = VALUES(`name`),
+                         `password_hash` = VALUES(`password_hash`);
+
 
 -- -----------------------------------------------------
 -- Table `bookLib`.`book`
@@ -32,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `bookLib`.`reader` (
 CREATE TABLE IF NOT EXISTS `bookLib`.`book` (
                                                 `id` BIGINT NOT NULL AUTO_INCREMENT,
                                                 `title` VARCHAR(255) NOT NULL,
+    `author` VARCHAR(255) NULL,
     `pages` INT NOT NULL,
     `genre` VARCHAR(50) NOT NULL,
     `language` VARCHAR(10) NULL DEFAULT 'en',

@@ -1,11 +1,11 @@
 package booklib.readingSessions;
 
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import booklib.books.Book;
 import booklib.exceptions.NotFoundException;
 import booklib.readers.Reader;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
             "SELECT " +
                     "rs.id AS rs_id, rs.pages_read AS rs_pages_read, rs.duration_minutes AS rs_duration_minutes, rs.created_at AS rs_created_at, " +
                     "r.id AS r_id, r.name AS r_name, r.password_hash AS r_password_hash, r.created_at AS r_created_at, " +
-                    "b.id AS b_id, b.title AS b_title, b.pages AS b_pages, b.genre AS b_genre, b.language AS b_language, b.created_at AS b_created_at " +
+                    "b.id AS b_id, b.title AS b_title, b.author AS b_author, b.pages AS b_pages, b.genre AS b_genre, b.language AS b_language, b.created_at AS b_created_at " +
                     "FROM reading_session rs " +
                     "JOIN reader r ON rs.reader_id = r.id " +
                     "JOIN book b ON rs.book_id = b.id";
@@ -76,6 +76,13 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
         return jdbcOperations.query(query, resultSetExtractor);
     }
 
+    @Override
+    public List<ReadingSession> findByReaderIdAndBookId(long readerId, long bookId) {
+        var query = SELECT_QUERY + " WHERE rs.reader_id = ? AND rs.book_id = ? ORDER BY rs.created_at DESC";
+        return jdbcOperations.query(query, resultSetExtractor, readerId, bookId);
+    }
+
+    @Override
     public ReadingSession findById(Long id) {
         var query = SELECT_QUERY + " WHERE rs.id = ?";
         var sessions = jdbcOperations.query(query, resultSetExtractor, id);
@@ -87,23 +94,26 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
 
     @Override
     public ReadingSession create(ReadingSession session) {
-        if (session == null) {
-            throw new IllegalArgumentException("ReadingSession is null");
-        }
-        if (session.getId() != null) {
-            throw new IllegalArgumentException("ReadingSession id must be null for create");
-        }
+        if (session == null) throw new IllegalArgumentException("ReadingSession is null");
+        if (session.getId() != null) throw new IllegalArgumentException("ReadingSession id must be null for create");
+        if (session.getReader() == null || session.getReader().getId() == null) throw new IllegalArgumentException("Reader is not set");
+        if (session.getBook() == null || session.getBook().getId() == null) throw new IllegalArgumentException("Book is not set");
 
         var keyHolder = new GeneratedKeyHolder();
+
         jdbcOperations.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO reading_session (reader_id, book_id, pages_read, duration_minutes) VALUES (?, ?, ?, ?)",
+                    "INSERT INTO reading_session (reader_id, book_id, pages_read, duration_minutes, created_at) " +
+                            "VALUES (?, ?, ?, ?, ?)",
                     new String[]{"id"}
             );
             ps.setLong(1, session.getReader().getId());
             ps.setLong(2, session.getBook().getId());
             ps.setInt(3, session.getPagesRead());
             ps.setInt(4, session.getDurationMinutes());
+            ps.setTimestamp(5, java.sql.Timestamp.valueOf(
+                    session.getCreatedAt() != null ? session.getCreatedAt() : java.time.LocalDateTime.now()
+            ));
             return ps;
         }, keyHolder);
 
@@ -113,21 +123,26 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
 
     @Override
     public ReadingSession update(ReadingSession session) {
-        if (session == null) {
-            throw new IllegalArgumentException("ReadingSession is null");
-        }
-        if (session.getId() == null) {
-            throw new IllegalArgumentException("ReadingSession id is null for update");
-        }
+        if (session == null) throw new IllegalArgumentException("ReadingSession is null");
+        if (session.getId() == null) throw new IllegalArgumentException("ReadingSession id is null for update");
+        if (session.getReader() == null || session.getReader().getId() == null) throw new IllegalArgumentException("Reader is not set");
+        if (session.getBook() == null || session.getBook().getId() == null) throw new IllegalArgumentException("Book is not set");
 
-        jdbcOperations.update(
-                "UPDATE reading_session SET reader_id = ?, book_id = ?, pages_read = ?, duration_minutes = ? WHERE id = ?",
+        int updated = jdbcOperations.update(
+                "UPDATE reading_session " +
+                        "SET reader_id = ?, book_id = ?, pages_read = ?, duration_minutes = ?, created_at = ? " +
+                        "WHERE id = ?",
                 session.getReader().getId(),
                 session.getBook().getId(),
                 session.getPagesRead(),
                 session.getDurationMinutes(),
+                java.sql.Timestamp.valueOf(session.getCreatedAt() != null ? session.getCreatedAt() : java.time.LocalDateTime.now()),
                 session.getId()
         );
+
+        if (updated != 1) {
+            throw new NotFoundException("Reading session with id " + session.getId() + " not found");
+        }
 
         return findById(session.getId());
     }

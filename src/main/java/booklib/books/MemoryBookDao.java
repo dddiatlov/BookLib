@@ -1,18 +1,13 @@
 package booklib.books;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class MemoryBookDao implements BookDao {
 
-    // глобальный список книг (store)
     private final List<Book> books;
-
-    // ключ = readerId, значение = набор id книг в его профиле
-    private final Map<Long, Set<Long>> readerBooks = new HashMap<>();
 
     public MemoryBookDao(List<Book> books) {
         this.books = books;
@@ -20,60 +15,40 @@ public class MemoryBookDao implements BookDao {
 
     @Override
     public int loadFromCsv(File file) {
-        var existingIds = books.stream()
-                .map(Book::getId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        int count = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
 
-        var loaded = new ArrayList<Book>();
+                // expected CSV columns:
+                // id,title,author,pages,genre,language,created_at
+                String[] parts = splitCsv(line);
+                if (parts.length < 7) continue;
 
-        Scanner scanner;
-        try {
-            scanner = new Scanner(file);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+                if (parts[0].equalsIgnoreCase("id")) continue;
+
+                Book b = new Book();
+                b.setId(Long.parseLong(parts[0].trim()));
+                b.setTitle(parts[1].trim());
+                b.setAuthor(parts[2].trim());
+                b.setPages(Integer.parseInt(parts[3].trim()));
+                b.setGenre(parts[4].trim());
+                b.setLanguage(parts[5].trim());
+                b.setCreatedAt(LocalDateTime.parse(parts[6].trim()));
+
+                books.add(b);
+                count++;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot load CSV: " + e.getMessage(), e);
         }
+        return count;
+    }
 
-        // пропускаем заголовок
-        if (scanner.hasNextLine()) {
-            scanner.nextLine();
-        }
-
-        while (scanner.hasNextLine()) {
-            var line = scanner.nextLine();
-            if (line.isBlank()) {
-                continue;
-            }
-
-            // предполагаемый формат csv:
-            // id,title,pages,genre,language,created_at
-            var parts = line.split(",", -1);
-
-            var id = Long.parseLong(parts[0]);
-            if (existingIds.contains(id)) {
-                continue;
-            }
-
-            var book = new Book();
-            book.setId(id);
-            book.setTitle(parts[1]);
-
-            if (!parts[2].isBlank()) {
-                book.setPages(Integer.parseInt(parts[2]));
-            }
-
-            book.setGenre(parts[3]);
-            book.setLanguage(parts[4]);
-
-            if (parts.length > 5 && !parts[5].isBlank()) {
-                book.setCreatedAt(LocalDateTime.parse(parts[5]));
-            }
-
-            loaded.add(book);
-        }
-
-        books.addAll(loaded);
-        return loaded.size();
+    @Override
+    public void add(Book book) {
+        books.add(book);
     }
 
     @Override
@@ -83,32 +58,30 @@ public class MemoryBookDao implements BookDao {
 
     @Override
     public Book findById(Long id) {
-        for (var book : books) {
-            if (Objects.equals(book.getId(), id)) {
-                return book;
-            }
-        }
-        return null;
+        return books.stream().filter(b -> Objects.equals(b.getId(), id)).findFirst().orElse(null);
     }
 
     @Override
     public List<Book> findByReaderId(Long readerId) {
-        var ids = readerBooks.getOrDefault(readerId, Collections.emptySet());
-        var result = new ArrayList<Book>();
-
-        for (var book : books) {
-            if (book.getId() != null && ids.contains(book.getId())) {
-                result.add(book);
-            }
-        }
-        return result;
+        // memory mode: no persistence
+        return List.of();
     }
 
     @Override
     public void addBookForReader(Long bookId, Long readerId, String status) {
-        // статус в in-memory не используем, просто линк
-        readerBooks
-                .computeIfAbsent(readerId, id -> new HashSet<>())
-                .add(bookId);
+        // memory mode: no-op
+    }
+
+    @Override
+    public void removeBookForReader(Long bookId, Long readerId) {
+        // memory mode: no-op
+    }
+
+    private static String[] splitCsv(String line) {
+        // Simple CSV splitter (no quoted commas handling). Enough for your dataset.
+        return Arrays.stream(line.split(",", -1))
+                .map(s -> s.replace("\uFEFF", "")) // BOM
+                .collect(Collectors.toList())
+                .toArray(new String[0]);
     }
 }
