@@ -1,10 +1,8 @@
 package booklib.readers;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class MemoryReaderDao implements ReaderDao {
 
@@ -15,46 +13,37 @@ public class MemoryReaderDao implements ReaderDao {
     }
 
     @Override
-    public int loadFromCsv(File file) {
-        var existingIds = readers.stream()
-                .map(Reader::getId)
-                .collect(Collectors.toSet());
-
-        var loadedList = new ArrayList<Reader>();
-
-        Scanner scanner;
-        try {
-            scanner = new Scanner(file);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+    public Reader findById(Long id) {
+        for (var r : readers) {
+            if (r.getId() != null && r.getId().equals(id)) return r;
         }
+        return null;
+    }
 
-        scanner.nextLine(); // skip header
-
-        while (scanner.hasNextLine()) {
-            var line = scanner.nextLine();
-            if (line.isBlank()) continue;
-
-            var parts = line.split(",", -1);
-
-            var id = Long.parseLong(parts[0]);
-            if (existingIds.contains(id)) continue;
-
-            var reader = new Reader();
-            reader.setId(id);
-            reader.setName(parts[1]);
-            reader.setPasswordHash(parts[2]);
-            reader.setCreatedAt(LocalDateTime.parse(parts[3]));
-
-            loadedList.add(reader);
+    @Override
+    public Reader findByUsername(String username) {
+        for (var r : readers) {
+            if (r.getName() != null && r.getName().equals(username)) return r;
         }
-
-        readers.addAll(loadedList);
-        return loadedList.size();
+        return null;
     }
 
     @Override
     public List<Reader> findAll() {
-        return readers;
+        return new ArrayList<>(readers);
+    }
+
+    @Override
+    public Reader save(Reader reader) {
+        if (reader.getId() == null) {
+            long nextId = readers.stream()
+                    .map(Reader::getId)
+                    .filter(x -> x != null)
+                    .max(Comparator.naturalOrder())
+                    .orElse(0L) + 1;
+            reader.setId(nextId);
+        }
+        readers.add(reader);
+        return reader;
     }
 }

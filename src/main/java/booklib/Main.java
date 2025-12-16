@@ -7,24 +7,20 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+
     @Override
     public void start(Stage stage) throws Exception {
-        var fxml = getClass().getResource("/booklib/MainView.fxml");
-        var loader = new FXMLLoader(fxml);
-        Parent rootPane = loader.load();
+        var url = Main.class.getResource("LoginView.fxml");
+        if (url == null) {
+            throw new IllegalStateException("FXML not found: LoginView.fxml");
+        }
 
-        var scene = new Scene(rootPane);
-        stage.setTitle("BookLib");
-        stage.setScene(scene);
+        var root = FXMLLoader.load(url);
+        stage.setTitle("BookLib - Login");
+        stage.setScene(new Scene((Parent) root));
         stage.show();
     }
 
-    // WARNING: This main is used for running the app from terminal using `mvn javafx:run`.
-    // This main will not work when running from IntelliJ IDEA, hence use IDELauncher.java instead.
-    // Explanation: The issue is the Java 9+ module system that JavaFX requires.
-    // However, modules are a nightmare to get working with maven, hence we do not use them at this moment.
-    // As a dirty but effective hack we can use another main method that calls this one.
-    // Hence, you should rather run IDELauncher.java
     public static void main(String[] args) {
         launch(args);
     }
