@@ -16,7 +16,7 @@ public class Main extends Application {
         }
 
         var root = FXMLLoader.load(url);
-        stage.setTitle("BookLib - Login");
+        stage.setTitle("app");
         stage.setScene(new Scene((Parent) root));
         stage.show();
     }

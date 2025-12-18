@@ -3,6 +3,7 @@ package booklib.readers;
 import booklib.Alerts;
 import booklib.Factory;
 import booklib.SceneSwitcher;
+import booklib.Session;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -19,10 +20,14 @@ public class LoginController {
     @FXML
     public void onLogin(ActionEvent e) {
         try {
-            authService.login(usernameField.getText(), passwordField.getText());
+            var reader = authService.login(usernameField.getText(), passwordField.getText());
 
-            // ✅ после успешного логина — на MainView.fxml
-            SceneSwitcher.switchTo("MainView.fxml", (Node) e.getSource());
+            // сохраняем текущего залогиненного пользователя
+            Session.setCurrentReader(reader);
+
+            // после логина — на MainView.fxml
+            SceneSwitcher.switchTo("/booklib/MainView.fxml", (Node) e.getSource());
+
 
         } catch (Exception ex) {
             Alerts.error("Login failed", ex.getMessage());

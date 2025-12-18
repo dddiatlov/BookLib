@@ -7,10 +7,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema bookLib
 -- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema bookLib
--- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `bookLib` DEFAULT CHARACTER SET utf8 ;
 USE `bookLib` ;
 
@@ -22,15 +18,16 @@ CREATE TABLE IF NOT EXISTS `bookLib`.`reader` (
                                                   `name` VARCHAR(100) NOT NULL,
     `password_hash` VARCHAR(255) NOT NULL,
     `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`))
-    ENGINE = InnoDB;
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_reader_name` (`name`)
+    ) ENGINE = InnoDB;
 
+-- Default user (password = dev, stored as SHA-256 hex)
 INSERT INTO `bookLib`.`reader` (`id`, `name`, `password_hash`)
-VALUES (1, 'Default Reader', 'dev')
+VALUES (1, 'Default Reader', 'ef260e9aa3c673af240d17a2660480361a8e081d1ffeca2a5ed0e3219fc18567')
     ON DUPLICATE KEY UPDATE
                          `name` = VALUES(`name`),
                          `password_hash` = VALUES(`password_hash`);
-
 
 -- -----------------------------------------------------
 -- Table `bookLib`.`book`
@@ -43,9 +40,8 @@ CREATE TABLE IF NOT EXISTS `bookLib`.`book` (
     `genre` VARCHAR(50) NOT NULL,
     `language` VARCHAR(10) NULL DEFAULT 'en',
     `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`))
-    ENGINE = InnoDB;
-
+    PRIMARY KEY (`id`)
+    ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `bookLib`.`reading_goal`
@@ -56,15 +52,14 @@ CREATE TABLE IF NOT EXISTS `bookLib`.`reading_goal` (
                                                         `target_hours` INT NULL,
                                                         `target_pages` INT NULL,
                                                         `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-                                                        PRIMARY KEY (`month`),
+                                                        PRIMARY KEY (`reader_id`, `month`),
     INDEX `fk_reading_goal_reader1_idx` (`reader_id` ASC) VISIBLE,
     CONSTRAINT `fk_reading_goal_reader1`
     FOREIGN KEY (`reader_id`)
     REFERENCES `bookLib`.`reader` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
-
+    ON UPDATE NO ACTION
+    ) ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `bookLib`.`favorite_books`
@@ -83,10 +78,8 @@ CREATE TABLE IF NOT EXISTS `bookLib`.`favorite_books` (
     FOREIGN KEY (`book_id`)
     REFERENCES `bookLib`.`book` (`id`)
     ON DELETE CASCADE
-    ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
-
-
+    ON UPDATE NO ACTION
+    ) ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `bookLib`.`book_status`
 -- -----------------------------------------------------
@@ -99,6 +92,7 @@ CREATE TABLE IF NOT EXISTS `bookLib`.`book_status` (
     INDEX `fk_book_status_reader1_idx` (`reader_id` ASC) VISIBLE,
     INDEX `fk_book_status_book1_idx` (`book_id` ASC) VISIBLE,
     PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_book_status_reader_book` (`reader_id`, `book_id`),
     CONSTRAINT `fk_book_status_reader1`
     FOREIGN KEY (`reader_id`)
     REFERENCES `bookLib`.`reader` (`id`)
@@ -108,10 +102,10 @@ CREATE TABLE IF NOT EXISTS `bookLib`.`book_status` (
     FOREIGN KEY (`book_id`)
     REFERENCES `bookLib`.`book` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
+    ON UPDATE NO ACTION
+    ) ENGINE = InnoDB;
 
-
+-- (дальше у тебя могут быть reading_session и т.п. — оставь как было, если там reader_id уже есть)
 -- -----------------------------------------------------
 -- Table `bookLib`.`reading_session`
 -- -----------------------------------------------------
@@ -119,90 +113,30 @@ CREATE TABLE IF NOT EXISTS `bookLib`.`reading_session` (
                                                            `id` BIGINT NOT NULL AUTO_INCREMENT,
                                                            `reader_id` BIGINT NOT NULL,
                                                            `book_id` BIGINT NOT NULL,
-                                                           `pages_read` INT NOT NULL,
-                                                           `duration_minutes` INT NOT NULL,
+
+                                                           `pages_read` INT NOT NULL DEFAULT 0,
+                                                           `duration_minutes` INT NOT NULL DEFAULT 0,
+
                                                            `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+
                                                            PRIMARY KEY (`id`),
-    INDEX `fk_reading_session_reader1_idx` (`reader_id` ASC) VISIBLE,
-    INDEX `fk_reading_session_book1_idx` (`book_id` ASC) VISIBLE,
-    CONSTRAINT `fk_reading_session_reader1`
+
+    INDEX `fk_reading_session_reader_idx` (`reader_id` ASC) VISIBLE,
+    INDEX `fk_reading_session_book_idx` (`book_id` ASC) VISIBLE,
+
+    CONSTRAINT `fk_reading_session_reader`
     FOREIGN KEY (`reader_id`)
     REFERENCES `bookLib`.`reader` (`id`)
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     ON UPDATE NO ACTION,
-    CONSTRAINT `fk_reading_session_book1`
+
+    CONSTRAINT `fk_reading_session_book`
     FOREIGN KEY (`book_id`)
     REFERENCES `bookLib`.`book` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bookLib`.`review`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bookLib`.`review` (
-                                                  `id` BIGINT NOT NULL AUTO_INCREMENT,
-                                                  `book_id` BIGINT NOT NULL,
-                                                  `reader_id` BIGINT NOT NULL,
-                                                  `rating` DECIMAL(2,1) NOT NULL,
-    `review_text` TEXT NULL,
-    `date_finished` DATE NOT NULL,
-    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX `fk_review_book1_idx` (`book_id` ASC) VISIBLE,
-    INDEX `fk_review_reader1_idx` (`reader_id` ASC) VISIBLE,
-    PRIMARY KEY (`id`),
-    CONSTRAINT `fk_review_book1`
-    FOREIGN KEY (`book_id`)
-    REFERENCES `bookLib`.`book` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-    CONSTRAINT `fk_review_reader1`
-    FOREIGN KEY (`reader_id`)
-    REFERENCES `bookLib`.`reader` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bookLib`.`author`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bookLib`.`author` (
-                                                  `id` BIGINT NOT NULL AUTO_INCREMENT,
-                                                  `name` VARCHAR(150) NOT NULL,
-    `country` VARCHAR(100) NULL,
-    `birth_year` YEAR NULL,
-    `death_year` YEAR NULL,
-    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`))
-    ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `bookLib`.`book_author`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `bookLib`.`book_author` (
-                                                       `author_id` BIGINT NOT NULL,
-                                                       `book_id` BIGINT NOT NULL,
-                                                       INDEX `fk_author_has_book_book1_idx` (`book_id` ASC) VISIBLE,
-    INDEX `fk_author_has_book_author1_idx` (`author_id` ASC) VISIBLE,
-    PRIMARY KEY (`author_id`, `book_id`),
-    CONSTRAINT `fk_author_has_book_author1`
-    FOREIGN KEY (`author_id`)
-    REFERENCES `bookLib`.`author` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-    CONSTRAINT `fk_author_has_book_book1`
-    FOREIGN KEY (`book_id`)
-    REFERENCES `bookLib`.`book` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-    ENGINE = InnoDB;
-
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION
+    ) ENGINE = InnoDB;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
-
-

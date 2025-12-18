@@ -4,22 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="привели проект BookLib в рабочее состояние на Java 17&#10;&#10;починили Maven + JavaFX + Lombok и устранили ошибки старта&#10;&#10;правильно связали FXML ↔ Controller (исчезли NullPointerException)&#10;&#10;разобрались, что падение было из-за MySQL, а не из-за Java&#10;&#10;настроили доступ к базе данных (пользователь, права, подключение)&#10;&#10;запустили приложение без краша и увидели рабочее главное окно&#10;&#10;убедились, что кнопки нажимаются, просто логика ещё не реализована&#10;&#10;поняли текущую стадию проекта и оценили прогресс (~70% готово)">
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/Alerts.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/SceneSwitcher.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/AuthService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/LoginController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/booklib/LoginView.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="логин реализован">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/init.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Controller.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/MemoryReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/MemoryReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/MysqlReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/MysqlReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/Reader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/ReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/ReaderDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/SceneSwitcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/SceneSwitcher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/MysqlBookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/MysqlBookDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/booklib/MainView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/booklib/MainView.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,7 +89,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Global Libraries&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
@@ -137,6 +133,8 @@
       <list>
         <item itemvalue="Application.IDELauncher" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="Application.IDELauncher" />
+        <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
   </component>
@@ -172,6 +170,9 @@
       <workItem from="1765635783724" duration="4024000" />
       <workItem from="1765640482146" duration="1099000" />
       <workItem from="1765642571259" duration="1552000" />
+      <workItem from="1765923460970" duration="3731000" />
+      <workItem from="1766003403339" duration="11420000" />
+      <workItem from="1766018075659" duration="3571000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -221,7 +222,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765377720680</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="логин реализован">
+      <option name="closed" value="true" />
+      <created>1765923510109</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1765923510109</updated>
+    </task>
+    <task id="LOCAL-00008" summary="логин реализован">
+      <option name="closed" value="true" />
+      <created>1765923539967</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1765923539967</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -238,7 +255,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="17dk" />
+                        <option value="WORKINGbranch_denys" />
                       </list>
                     </value>
                   </entry>
@@ -254,6 +271,7 @@
     <MESSAGE value="init" />
     <MESSAGE value="added book , reader entities (lombok, jdbc dependencies)" />
     <MESSAGE value="привели проект BookLib в рабочее состояние на Java 17&#10;&#10;починили Maven + JavaFX + Lombok и устранили ошибки старта&#10;&#10;правильно связали FXML ↔ Controller (исчезли NullPointerException)&#10;&#10;разобрались, что падение было из-за MySQL, а не из-за Java&#10;&#10;настроили доступ к базе данных (пользователь, права, подключение)&#10;&#10;запустили приложение без краша и увидели рабочее главное окно&#10;&#10;убедились, что кнопки нажимаются, просто логика ещё не реализована&#10;&#10;поняли текущую стадию проекта и оценили прогресс (~70% готово)" />
-    <option name="LAST_COMMIT_MESSAGE" value="привели проект BookLib в рабочее состояние на Java 17&#10;&#10;починили Maven + JavaFX + Lombok и устранили ошибки старта&#10;&#10;правильно связали FXML ↔ Controller (исчезли NullPointerException)&#10;&#10;разобрались, что падение было из-за MySQL, а не из-за Java&#10;&#10;настроили доступ к базе данных (пользователь, права, подключение)&#10;&#10;запустили приложение без краша и увидели рабочее главное окно&#10;&#10;убедились, что кнопки нажимаются, просто логика ещё не реализована&#10;&#10;поняли текущую стадию проекта и оценили прогресс (~70% готово)" />
+    <MESSAGE value="логин реализован" />
+    <option name="LAST_COMMIT_MESSAGE" value="логин реализован" />
   </component>
 </project>

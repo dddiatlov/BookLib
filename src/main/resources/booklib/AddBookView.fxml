@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="booklib.books.AddBookController"
+      spacing="12"
+      prefWidth="420"
+      style="-fx-padding: 16; -fx-background-color: white;">
+
+    <Label text="Add Book"
+           style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+    <GridPane hgap="10" vgap="10">
+        <columnConstraints>
+            <ColumnConstraints prefWidth="110"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+
+        <Label text="Title:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="titleField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Author:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="authorField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Pages:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="pagesField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Genre:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="genreField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Language:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="languageCombo" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel" onAction="#onCancel"/>
+        <Button text="Save" defaultButton="true" onAction="#onSave"/>
+    </HBox>
+</VBox>

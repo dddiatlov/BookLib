@@ -2,6 +2,10 @@ package booklib.books;
 
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+
+import java.sql.Statement;
 
 import java.io.File;
 import java.sql.Timestamp;
@@ -57,16 +61,33 @@ public class MysqlBookDao implements BookDao {
     public void add(Book book) {
         if (book == null) throw new IllegalArgumentException("Book is null");
 
-        jdbcOperations.update(
-                "INSERT INTO book (title, author, pages, genre, language, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-                book.getTitle(),
-                book.getAuthor(),
-                book.getPages(),
-                book.getGenre(),
-                book.getLanguage(),
-                Timestamp.valueOf(book.getCreatedAt() != null ? book.getCreatedAt() : LocalDateTime.now())
-        );
+        LocalDateTime createdAt = (book.getCreatedAt() != null) ? book.getCreatedAt() : LocalDateTime.now();
+        book.setCreatedAt(createdAt);
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcOperations.update(con -> {
+            var ps = con.prepareStatement(
+                    "INSERT INTO book (title, author, pages, genre, language, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+            ps.setString(1, book.getTitle());
+            ps.setString(2, book.getAuthor());
+            ps.setInt(3, book.getPages());
+            ps.setString(4, book.getGenre());
+            ps.setString(5, book.getLanguage());
+            ps.setTimestamp(6, Timestamp.valueOf(createdAt));
+            return ps;
+        }, keyHolder);
+
+        Number key = keyHolder.getKey();
+        if (key != null) {
+            book.setId(key.longValue());
+        } else {
+            throw new IllegalStateException("Failed to obtain generated book id.");
+        }
     }
+
 
     @Override
     public List<Book> findAll() {

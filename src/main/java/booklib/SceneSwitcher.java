@@ -6,22 +6,25 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.util.Objects;
+public final class SceneSwitcher {
 
-public class SceneSwitcher {
+    private SceneSwitcher() {}
 
-    public static void switchTo(String fxmlFile, Node anyNodeFromScene) {
+    public static void switchTo(String fxmlResourcePath, Node anyNodeFromCurrentScene) {
         try {
-            var url = Objects.requireNonNull(
-                    SceneSwitcher.class.getResource("/booklib/" + fxmlFile),
-                    "FXML not found: /booklib/" + fxmlFile
-            );
+            var url = SceneSwitcher.class.getResource(fxmlResourcePath);
+            if (url == null) {
+                throw new IllegalArgumentException("FXML not found on classpath: " + fxmlResourcePath);
+            }
 
-            var root = FXMLLoader.load(url);
-            Stage stage = (Stage) anyNodeFromScene.getScene().getWindow();
-            stage.setScene(new Scene((Parent) root));
+            Parent root = FXMLLoader.load(url);
+            Stage stage = (Stage) anyNodeFromCurrentScene.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+
         } catch (Exception e) {
-            Alerts.error("UI error", "Cannot open screen: " + fxmlFile);
+            e.printStackTrace();
+            Alerts.error("UI error", "Cannot open screen: " + fxmlResourcePath + "\n" + e.getMessage());
         }
     }
 }

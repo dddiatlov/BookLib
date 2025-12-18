@@ -1,6 +1,7 @@
 package booklib.readingSessions;
 
 import booklib.Factory;
+import booklib.Session;
 import booklib.books.Book;
 import booklib.readers.Reader;
 import javafx.fxml.FXML;
@@ -14,46 +15,36 @@ public class ReadingSessionController {
 
     private final ReadingSessionDao sessionDao = Factory.INSTANCE.getReadingSessionDao();
 
-    private Book book;
-    private ReadingSession editingSession = null; // if not null => edit mode
-
-    @FXML private Label bookLabel;
+    @FXML private Label headerLabel;
+    @FXML private DatePicker datePicker;
     @FXML private TextField pagesReadField;
     @FXML private TextField durationField;
-    @FXML private DatePicker datePicker;
     @FXML private Button saveButton;
-    @FXML private Button cancelButton;
+
+    private Book book;
+    private ReadingSession editingSession;
 
     public void setBook(Book book) {
         this.book = book;
-        if (bookLabel != null) {
-            bookLabel.setText(book != null ? book.getTitle() : "Book");
+        if (headerLabel != null && book != null) {
+            headerLabel.setText("Reading session for: " + book.getTitle());
         }
     }
 
     public void setEditingSession(ReadingSession session) {
         this.editingSession = session;
-
         if (session != null) {
-            this.book = session.getBook();
-            if (bookLabel != null && book != null) bookLabel.setText(book.getTitle());
-
-            pagesReadField.setText(String.valueOf(session.getPagesRead()));
-            durationField.setText(String.valueOf(session.getDurationMinutes()));
-
-            if (session.getCreatedAt() != null) {
+            if (datePicker != null && session.getCreatedAt() != null) {
                 datePicker.setValue(session.getCreatedAt().toLocalDate());
-            } else {
-                datePicker.setValue(LocalDate.now());
             }
-
-            if (saveButton != null) saveButton.setText("Update");
+            if (pagesReadField != null) pagesReadField.setText(String.valueOf(session.getPagesRead()));
+            if (durationField != null) durationField.setText(String.valueOf(session.getDurationMinutes()));
         }
     }
 
     @FXML
     private void initialize() {
-        if (datePicker != null && datePicker.getValue() == null) {
+        if (datePicker != null) {
             datePicker.setValue(LocalDate.now());
         }
     }
@@ -62,6 +53,12 @@ public class ReadingSessionController {
     private void onSave() {
         if (book == null) {
             showError("Book is not set.");
+            return;
+        }
+
+        Reader r = Session.getCurrentReader();
+        if (r == null || r.getId() == null) {
+            showError("No logged-in reader. Please login again.");
             return;
         }
 
@@ -84,10 +81,6 @@ public class ReadingSessionController {
         if (d != null) createdAt = d.atTime(LocalDateTime.now().toLocalTime());
         else createdAt = LocalDateTime.now();
 
-        // dev reader
-        Reader r = new Reader();
-        r.setId(1L);
-
         try {
             if (editingSession == null) {
                 ReadingSession session = new ReadingSession();
@@ -96,21 +89,21 @@ public class ReadingSessionController {
                 session.setPagesRead(pages);
                 session.setDurationMinutes(minutes);
                 session.setCreatedAt(createdAt);
+
                 sessionDao.create(session);
             } else {
-                editingSession.setBook(book);
-                editingSession.setReader(r);
                 editingSession.setPagesRead(pages);
                 editingSession.setDurationMinutes(minutes);
                 editingSession.setCreatedAt(createdAt);
+                // reader/book уже есть, но оставим корректно:
+                editingSession.setReader(r);
+                editingSession.setBook(book);
+
                 sessionDao.update(editingSession);
             }
-
             close();
-
         } catch (Exception ex) {
-            ex.printStackTrace();
-            showError("Failed to save reading session:\n" + ex.getMessage());
+            showError("Cannot save session: " + ex.getMessage());
         }
     }
 
