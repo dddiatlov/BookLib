@@ -1,18 +1,35 @@
+# КОНФИГУРАЦИЯ DOCKER ДЛЯ ЗАПУСКА БАЗЫ ДАННЫХ MYSQL
+# 
+# ЦЕЛИ ИСПОЛЬЗОВАНИЯ DOCKER:
+# 1. Обеспечить одинаковое окружение для всех разработчиков
+# 2. Упростить развертывание приложения
+# 3. Изолировать базу данных от основной системы
+
 services:
   mysql:
-    image: mysql:8.4.2
-    container_name: booklib-mysql
+    image: mysql:8.4.2              # Используем официальный образ MySQL версии 8.4.2
+    container_name: booklib-mysql   # Имя контейнера для удобной идентификации
+    
     environment:
-      MYSQL_ROOT_PASSWORD: bookLib
-      MYSQL_DATABASE: bookLib
-      MYSQL_USER: bookLib
-      MYSQL_PASSWORD: bookLib
+      # ПАРАМЕТРЫ БАЗЫ ДАННЫХ:
+      MYSQL_ROOT_PASSWORD: bookLib  # Пароль для root пользователя
+      MYSQL_DATABASE: bookLib       # Создаваемая база данных
+      MYSQL_USER: bookLib           # Создаваемый пользователь
+      MYSQL_PASSWORD: bookLib       # Пароль пользователя
+    
     ports:
-      - "3307:3306"
+      - "3307:3306"  # Проброс портов: 3307 на хосте -> 3306 в контейнере
+      # Используем порт 3307, чтобы не конфликтовать с локальным MySQL (если есть)
+    
     volumes:
+      # МОНТИРОВАНИЕ ФАЙЛА ИНИЦИАЛИЗАЦИИ БД:
+      # ./init.sql в текущей директории будет выполнен при первом запуске контейнера
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    
     healthcheck:
+      # ПРОВЕРКА ЖИЗНЕСПОСОБНОСТИ КОНТЕЙНЕРА:
+      # MySQL будет считаться работоспособным, когда ответит на ping
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 10s  # Проверять каждые 10 секунд
+      timeout: 5s    # Таймаут 5 секунд
+      retries: 5     # Количество попыток

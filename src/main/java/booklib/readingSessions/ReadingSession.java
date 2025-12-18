@@ -8,23 +8,35 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
+/**
+ * МОДЕЛЬ СЕССИИ ЧТЕНИЯ (ReadingSession)
+ * Представляет одну сессию чтения, связанную с книгой и читателем.
+ * Соответствует таблице 'reading_session' в базе данных.
+ */
 @Data
 public class ReadingSession {
-    private Long id;
-    private Reader reader;
-    private Book book;
-    private int pagesRead;
-    private int durationMinutes;
-    private LocalDateTime createdAt;
+    private Long id;                      // Уникальный идентификатор сессии
+    private Reader reader;                // Читатель, который читал книгу
+    private Book book;                    // Книга, которую читали
+    private int pagesRead;                // Количество прочитанных страниц в эту сессию
+    private int durationMinutes;          // Продолжительность чтения в минутах
+    private LocalDateTime createdAt;      // Дата и время создания записи о сессии
 
+    /**
+     * Создает объект ReadingSession из ResultSet (стандартные имена колонок)
+     */
     public static ReadingSession fromResultSet(ResultSet rs) throws SQLException {
         return fromResultSet(rs, "");
     }
 
+    /**
+     * Создает объект ReadingSession из ResultSet с поддержкой алиасов
+     * @param aliasPrefix префикс для колонок (например, "rs_" для "rs.id")
+     */
     public static ReadingSession fromResultSet(ResultSet rs, String aliasPrefix) throws SQLException {
         long id = rs.getLong(aliasPrefix + "id");
         if (rs.wasNull()) {
-            return null;
+            return null; // Если ID null, возвращаем null
         }
 
         ReadingSession session = new ReadingSession();
@@ -36,6 +48,10 @@ public class ReadingSession {
         return session;
     }
 
+    /**
+     * Переопределенный toString для удобного отображения в UI
+     * Формат: "дата — название книги | количество страниц | продолжительность в минутах"
+     */
     @Override
     public String toString() {
         String date = (createdAt != null) ? createdAt.toLocalDate().toString() : "-";

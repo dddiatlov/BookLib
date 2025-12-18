@@ -5,14 +5,40 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * РЕАЛИЗАЦИЯ BookDao ДЛЯ ХРАНЕНИЯ ДАННЫХ В ПАМЯТИ
+ * Используется:
+ * 1. Для тестирования без базы данных
+ * 2. Как временное хранилище при загрузке CSV
+ * 3. В демо-режиме приложения
+ *
+ * ОСОБЕННОСТИ:
+ * - Данные теряются после закрытия приложения
+ * - Не поддерживает связи между читателями и книгами
+ * - Не поддерживает избранные книги
+ * - Простая реализация для быстрого старта
+ */
 public class MemoryBookDao implements BookDao {
 
+    // Хранилище - обычный ArrayList в памяти
     private final List<Book> books;
 
+    /**
+     * Конструктор принимает существующий список
+     * Это позволяет инициализировать DAO предзагруженными данными
+     */
     public MemoryBookDao(List<Book> books) {
         this.books = books;
     }
 
+    /**
+     * ЗАГРУЗКА ИЗ CSV
+     * Формат файла: id,title,author,pages,genre,language,created_at
+     * Особенности:
+     * - Пропускает пустые строки
+     * - Пропускает заголовок (строку с "id")
+     * - Бросает RuntimeException при ошибке (т.к. в памяти нет транзакций)
+     */
     @Override
     public int loadFromCsv(File file) {
         int count = 0;
@@ -21,8 +47,6 @@ public class MemoryBookDao implements BookDao {
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
 
-                // expected CSV columns:
-                // id,title,author,pages,genre,language,created_at
                 String[] parts = splitCsv(line);
                 if (parts.length < 7) continue;
 
@@ -46,6 +70,9 @@ public class MemoryBookDao implements BookDao {
         return count;
     }
 
+    /**
+     * ПРОСТЫЕ ОПЕРАЦИИ (работают полностью)
+     */
     @Override
     public void add(Book book) {
         books.add(book);
@@ -53,55 +80,69 @@ public class MemoryBookDao implements BookDao {
 
     @Override
     public List<Book> findAll() {
+        // Возвращаем копию, чтобы внешний код не мог изменить внутренний список
         return new ArrayList<>(books);
     }
 
     @Override
     public Book findById(Long id) {
-        return books.stream().filter(b -> Objects.equals(b.getId(), id)).findFirst().orElse(null);
+        // Используем Stream API для поиска
+        return books.stream()
+                .filter(b -> Objects.equals(b.getId(), id))
+                .findFirst()
+                .orElse(null);
     }
+
+    // ========== ЗАГЛУШКИ ==========
+    /**
+     * СЛЕДУЮЩИЕ МЕТОДЫ - ЗАГЛУШКИ
+     * В памяти не реализованы связи между сущностями
+     * Эти методы работают только в MysqlBookDao
+     */
 
     @Override
     public List<Book> findByReaderId(Long readerId) {
-        // memory mode: no persistence
-        return List.of();
+        return List.of(); // Всегда пустой список
     }
 
     @Override
     public void addBookForReader(Long bookId, Long readerId, String status) {
-        // memory mode: no-op
+        // Ничего не делаем - в памяти нет связи читатель-книга
     }
 
     @Override
     public void removeBookForReader(Long bookId, Long readerId) {
-        // memory mode: no-op
+        // Ничего не делаем
     }
 
     @Override
     public boolean isFavorite(long readerId, long bookId) {
-        // In-memory DAO does not support favorites
-        return false;
+        return false; // В памяти нет избранного
     }
 
     @Override
     public void addFavorite(long readerId, long bookId) {
-        // no-op for memory implementation
+        // Ничего не делаем
     }
 
     @Override
     public void removeFavorite(long readerId, long bookId) {
-        // no-op for memory implementation
+        // Ничего не делаем
     }
 
     @Override
     public List<Book> findFavoritesByReaderId(long readerId) {
-        return List.of();
+        return List.of(); // Пустой список
     }
 
+    /**
+     * ВСПОМОГАТЕЛЬНЫЙ МЕТОД ДЛЯ ПАРСИНГА CSV
+     * Упрощенный парсер (не обрабатывает кавычки и экранированные запятые)
+     * Удаляет BOM (Byte Order Mark) - невидимый символ в начале некоторых UTF-8 файлов
+     */
     private static String[] splitCsv(String line) {
-        // Simple CSV splitter (no quoted commas handling). Enough for your dataset.
         return Arrays.stream(line.split(",", -1))
-                .map(s -> s.replace("\uFEFF", "")) // BOM
+                .map(s -> s.replace("\uFEFF", "")) // Удаление BOM
                 .collect(Collectors.toList())
                 .toArray(new String[0]);
     }

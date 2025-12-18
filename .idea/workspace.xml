@@ -4,7 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="logout" />
+    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="- logout">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Controller.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Factory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Factory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/SceneSwitcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/SceneSwitcher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Session.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/AddBookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/AddBookController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/Book.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/BookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/BookDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/MemoryBookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/MemoryBookDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/MysqlBookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/MysqlBookDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/MemoryReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/MemoryReaderDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/MysqlReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/MysqlReaderDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/Reader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/ReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/ReaderDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/MysqlReadingSessionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/MysqlReadingSessionDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSession.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionModel.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -167,7 +190,7 @@
       <workItem from="1766078957846" duration="233000" />
       <workItem from="1766079216161" duration="5509000" />
       <workItem from="1766084786747" duration="964000" />
-      <workItem from="1766086025247" duration="389000" />
+      <workItem from="1766086025247" duration="6254000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -257,7 +280,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766086305300</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="- logout">
+      <option name="closed" value="true" />
+      <created>1766086696369</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1766086696369</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -294,6 +325,7 @@
     <MESSAGE value="pre final" />
     <MESSAGE value="ревьюшки" />
     <MESSAGE value="logout" />
-    <option name="LAST_COMMIT_MESSAGE" value="logout" />
+    <MESSAGE value="- logout" />
+    <option name="LAST_COMMIT_MESSAGE" value="- logout" />
   </component>
 </project>

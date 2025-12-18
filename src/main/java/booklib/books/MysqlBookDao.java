@@ -6,17 +6,31 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Statement;
-
 import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ПОЛНОЦЕННАЯ РЕАЛИЗАЦИЯ BookDao ДЛЯ MySQL
+ * Использует Spring JDBC для работы с базой данных
+ * Особенности:
+ * - Поддерживает все связи между таблицами
+ * - Использует транзакции (через Spring)
+ * - Генерирует ID через auto_increment
+ * - Реализует все методы интерфейса
+ */
 public class MysqlBookDao implements BookDao {
 
+    // Spring JdbcTemplate для выполнения SQL запросов
     private final JdbcOperations jdbcOperations;
 
+    /**
+     * ЭКСТРАКТОР ДАННЫХ
+     * Преобразует ResultSet (результат SQL запроса) в List<Book>
+     * Используется в методах findAll() и findById()
+     */
     private final ResultSetExtractor<List<Book>> bookExtractor = rs -> {
         var books = new ArrayList<Book>();
         while (rs.next()) {
@@ -26,13 +40,25 @@ public class MysqlBookDao implements BookDao {
         return books;
     };
 
+    // SQL запрос для получения всех книг
     private static final String SELECT_ALL =
             "SELECT id, title, author, pages, genre, language, created_at FROM book";
 
+    /**
+     * Конструктор с внедрением зависимости (Dependency Injection)
+     * @param jdbcOperations обычно это JdbcTemplate из Spring
+     */
     public MysqlBookDao(JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
     }
 
+    /**
+     * ЗАГРУЗКА ИЗ CSV С ИСПОЛЬЗОВАНИЕМ MemoryBookDao
+     * Алгоритм:
+     * 1. Загружаем CSV в память через MemoryBookDao
+     * 2. Сохраняем каждую книгу в MySQL
+     * 3. Используем INSERT ... ON DUPLICATE KEY UPDATE для обновления существующих книг
+     */
     @Override
     public int loadFromCsv(File file) {
         var memoryDao = new MemoryBookDao(new ArrayList<>());
@@ -57,6 +83,11 @@ public class MysqlBookDao implements BookDao {
         return loaded;
     }
 
+    /**
+     * ДОБАВЛЕНИЕ НОВОЙ КНИГИ С ГЕНЕРАЦИЕЙ ID
+     * Использует GeneratedKeyHolder для получения сгенерированного ID
+     * Устанавливает текущее время, если createdAt не указан
+     */
     @Override
     public void add(Book book) {
         if (book == null) throw new IllegalArgumentException("Book is null");
@@ -80,6 +111,7 @@ public class MysqlBookDao implements BookDao {
             return ps;
         }, keyHolder);
 
+        // Получаем сгенерированный ID и устанавливаем его в объект
         Number key = keyHolder.getKey();
         if (key != null) {
             book.setId(key.longValue());
@@ -88,12 +120,17 @@ public class MysqlBookDao implements BookDao {
         }
     }
 
-
+    /**
+     * ПОЛУЧЕНИЕ ВСЕХ КНИГ (без статусов)
+     */
     @Override
     public List<Book> findAll() {
         return jdbcOperations.query(SELECT_ALL, bookExtractor);
     }
 
+    /**
+     * ПОИСК КНИГИ ПО ID
+     */
     @Override
     public Book findById(Long id) {
         var list = jdbcOperations.query(
@@ -104,24 +141,33 @@ public class MysqlBookDao implements BookDao {
         return list.isEmpty() ? null : list.get(0);
     }
 
+    /**
+     * НАХОЖДЕНИЕ КНИГ КОНКРЕТНОГО ЧИТАТЕЛЯ (МОИ КНИГИ)
+     * JOIN между book и book_status
+     * Возвращает книги со статусами (поле status заполняется)
+     */
     @Override
     public List<Book> findByReaderId(Long readerId) {
         String sql =
                 "SELECT " +
                         "b.id, b.title, b.author, b.pages, b.genre, b.language, b.created_at, " +
-                        "bs.status AS bs_status " +
+                        "bs.status AS bs_status " +  // Алиас для колонки status
                         "FROM book b " +
                         "JOIN book_status bs ON bs.book_id = b.id " +
                         "WHERE bs.reader_id = ? " +
                         "ORDER BY bs.created_at DESC";
 
         return jdbcOperations.query(sql, (rs, rowNum) -> {
-            Book book = Book.fromResultSet(rs);     // reads book columns
-            book.setStatus(rs.getString("bs_status")); // reads status explicitly
+            Book book = Book.fromResultSet(rs);     // читает основные поля книги
+            book.setStatus(rs.getString("bs_status")); // явно устанавливаем статус
             return book;
         }, readerId);
     }
 
+    /**
+     * ДОБАВЛЕНИЕ КНИГИ ДЛЯ ЧИТАТЕЛЯ (в book_status)
+     * Использует ON DUPLICATE KEY UPDATE для обновления статуса, если связь уже существует
+     */
     @Override
     public void addBookForReader(Long bookId, Long readerId, String status) {
         jdbcOperations.update(
@@ -132,6 +178,9 @@ public class MysqlBookDao implements BookDao {
         );
     }
 
+    /**
+     * УДАЛЕНИЕ КНИГИ ИЗ "МОИХ КНИГ"
+     */
     @Override
     public void removeBookForReader(Long bookId, Long readerId) {
         jdbcOperations.update(
@@ -140,6 +189,11 @@ public class MysqlBookDao implements BookDao {
         );
     }
 
+    // ========== МЕТОДЫ ДЛЯ ИЗБРАННЫХ КНИГ ==========
+
+    /**
+     * ПРОВЕРКА, ЯВЛЯЕТСЯ ЛИ КНИГА ИЗБРАННОЙ
+     */
     @Override
     public boolean isFavorite(long readerId, long bookId) {
         Integer cnt = jdbcOperations.queryForObject(
@@ -150,6 +204,10 @@ public class MysqlBookDao implements BookDao {
         return cnt != null && cnt > 0;
     }
 
+    /**
+     * ДОБАВЛЕНИЕ В ИЗБРАННОЕ
+     * IGNORE предотвращает ошибку при повторном добавлении
+     */
     @Override
     public void addFavorite(long readerId, long bookId) {
         jdbcOperations.update(
@@ -158,6 +216,9 @@ public class MysqlBookDao implements BookDao {
         );
     }
 
+    /**
+     * УДАЛЕНИЕ ИЗ ИЗБРАННОГО
+     */
     @Override
     public void removeFavorite(long readerId, long bookId) {
         jdbcOperations.update(
@@ -166,6 +227,10 @@ public class MysqlBookDao implements BookDao {
         );
     }
 
+    /**
+     * ПОЛУЧЕНИЕ ВСЕХ ИЗБРАННЫХ КНИГ ЧИТАТЕЛЯ
+     * LEFT JOIN с book_status для получения статуса чтения (если книга в "Моих книгах")
+     */
     @Override
     public List<Book> findFavoritesByReaderId(long readerId) {
         String sql = """
@@ -181,8 +246,8 @@ public class MysqlBookDao implements BookDao {
                 """;
 
         return jdbcOperations.query(sql, (rs, rowNum) -> {
-            Book book = Book.fromResultSet(rs);              // reads b.* columns
-            book.setStatus(rs.getString("bs_status"));       // preserves status (FINISHED stays FINISHED)
+            Book book = Book.fromResultSet(rs);              // основные поля книги
+            book.setStatus(rs.getString("bs_status"));       // статус (может быть null)
             return book;
         }, readerId);
     }

@@ -11,6 +11,10 @@ import javafx.stage.Stage;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * КОНТРОЛЛЕР ОКНА ДЛЯ ДОБАВЛЕНИЯ/РЕДАКТИРОВАНИЯ СЕССИИ ЧТЕНИЯ
+ * Управляет диалоговым окном (ReadingSessionView.fxml)
+ */
 public class ReadingSessionController {
 
     private final ReadingSessionDao readingSessionDao = Factory.INSTANCE.getReadingSessionDao();
@@ -26,6 +30,9 @@ public class ReadingSessionController {
     private Book book;
     private ReadingSession editingSession;
 
+    /**
+     * Устанавливает книгу, для которой создается сессия чтения
+     */
     public void setBook(Book book) {
         this.book = book;
 
@@ -36,6 +43,9 @@ public class ReadingSessionController {
         applyInputConstraints();
     }
 
+    /**
+     * Устанавливает сессию для редактирования (вместо создания новой)
+     */
     public void setEditingSession(ReadingSession session) {
         this.editingSession = session;
 
@@ -55,16 +65,19 @@ public class ReadingSessionController {
         if (datePicker != null) {
             datePicker.setValue(LocalDate.now());
         }
-        applyInputConstraints(); // safe even before book is set
+        applyInputConstraints(); // безопасно, даже если книга еще не установлена
     }
 
+    /**
+     * Применяет ограничения на ввод данных в поля формы
+     */
     private void applyInputConstraints() {
-        // digits-only for duration
+        // Только цифры для продолжительности
         if (durationField != null) {
             durationField.setTextFormatter(digitsOnlyFormatter());
         }
 
-        // pages: depends on remaining pages for this book
+        // Ограничения для страниц: зависит от оставшихся страниц в книге
         if (pagesReadField != null) {
             if (book == null) {
                 pagesReadField.setTextFormatter(digitsOnlyFormatter());
@@ -92,14 +105,15 @@ public class ReadingSessionController {
                 limitLabel.setText("You can add at most: " + remaining + " pages in this session.");
             }
 
-            // clamp typed/loaded value to range
+            // Ограничение введенного значения в пределах допустимого диапазона
             clampFieldToRange(pagesReadField, 1, remaining);
         }
     }
 
     /**
-     * Remaining pages you are allowed to record in THIS session.
-     * (book.pages - alreadyRecordedPages). If editing, exclude edited session's old pages.
+     * Вычисляет количество страниц, которые еще можно прочитать по этой книге
+     * (общее количество страниц в книге минус уже прочитанные).
+     * При редактировании исключает страницы редактируемой сессии.
      */
     private int remainingPagesForThisBook() {
         long readerId = Session.requireReaderId();
@@ -107,7 +121,7 @@ public class ReadingSessionController {
 
         int alreadyRead = readingSessionDao.sumPagesForReaderAndBook(readerId, book.getId());
 
-        // If editing: remove old pages of this session from the total
+        // При редактировании: вычитаем страницы редактируемой сессии из общего числа прочитанных
         if (editingSession != null && editingSession.getId() != null) {
             alreadyRead -= editingSession.getPagesRead();
             if (alreadyRead < 0) alreadyRead = 0;
@@ -116,6 +130,9 @@ public class ReadingSessionController {
         return Math.max(0, bookPages - alreadyRead);
     }
 
+    /**
+     * Создает TextFormatter, который разрешает ввод только цифр
+     */
     private TextFormatter<String> digitsOnlyFormatter() {
         return new TextFormatter<>(change -> {
             String t = change.getControlNewText();
@@ -124,15 +141,18 @@ public class ReadingSessionController {
         });
     }
 
+    /**
+     * Создает TextFormatter, который разрешает ввод цифр в заданном диапазоне
+     */
     private TextFormatter<String> rangedIntFormatter(int min, int max) {
         return new TextFormatter<>(change -> {
             String t = change.getControlNewText();
-            if (t.isBlank()) return change; // allow clearing while typing
+            if (t.isBlank()) return change; // разрешаем очистку при вводе
             if (!t.matches("\\d{0,9}")) return null;
 
             try {
                 int v = Integer.parseInt(t);
-                if (v < min || v > max) return null; // block out-of-range
+                if (v < min || v > max) return null; // блокируем ввод вне диапазона
             } catch (NumberFormatException ex) {
                 return null;
             }
@@ -140,6 +160,9 @@ public class ReadingSessionController {
         });
     }
 
+    /**
+     * Ограничивает значение в текстовом поле заданным диапазоном
+     */
     private void clampFieldToRange(TextField field, int min, int max) {
         String t = field.getText();
         if (t == null || t.isBlank()) return;
@@ -182,7 +205,7 @@ public class ReadingSessionController {
             return;
         }
 
-        // HARD LIMIT (prevents 150 + 350 case)
+        // Жесткое ограничение (предотвращает случай, когда уже прочитано 150, а вводится 350)
         int remaining = remainingPagesForThisBook();
         if (remaining <= 0) {
             showError("Book is already finished. You cannot add more pages.");

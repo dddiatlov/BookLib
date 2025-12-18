@@ -6,6 +6,10 @@ import booklib.readers.Reader;
 
 import java.time.LocalDate;
 
+/**
+ * МОДЕЛЬ ДЛЯ ОТОБРАЖЕНИЯ СЕССИИ ЧТЕНИЯ В ПОЛЬЗОВАТЕЛЬСКОМ ИНТЕРФЕЙСЕ
+ * Использует JavaFX свойства (Property) для двусторонней привязки данных.
+ */
 public class ReadingSessionModel {
 
     private Long id = null;
@@ -16,6 +20,9 @@ public class ReadingSessionModel {
     private final IntegerProperty pagesReadProperty = new SimpleIntegerProperty();
     private final IntegerProperty durationMinutesProperty = new SimpleIntegerProperty();
 
+    /**
+     * Устанавливает режим редактирования, заполняя свойства из существующей сессии
+     */
     public void setEditMode(ReadingSession session) {
         this.id = session.getId();
         dateProperty.set(session.getCreatedAt() != null ? session.getCreatedAt().toLocalDate() : LocalDate.now());
@@ -24,6 +31,8 @@ public class ReadingSessionModel {
         pagesReadProperty.set(session.getPagesRead());
         durationMinutesProperty.set(session.getDurationMinutes());
     }
+
+    // Геттеры для свойств (используются для привязки в FXML)
 
     public ObjectProperty<LocalDate> dateProperty() {
         return dateProperty;
@@ -45,6 +54,9 @@ public class ReadingSessionModel {
         return durationMinutesProperty;
     }
 
+    /**
+     * Преобразует модель в объект ReadingSession для сохранения в БД
+     */
     public ReadingSession toReadingSession() {
         ReadingSession session = new ReadingSession();
         session.setId(id);
@@ -52,11 +64,14 @@ public class ReadingSessionModel {
         session.setBook(bookProperty.get());
         session.setPagesRead(pagesReadProperty.get());
         session.setDurationMinutes(durationMinutesProperty.get());
-        // createdAt можна залишити null – БД сама поставить current_timestamp
+        // createdAt можно оставить null – БД сама поставит current_timestamp
         session.setCreatedAt(null);
         return session;
     }
 
+    /**
+     * Проверяет, находимся ли мы в режиме редактирования (есть id)
+     */
     public boolean isEditMode() {
         return id != null;
     }

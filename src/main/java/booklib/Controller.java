@@ -19,6 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -98,25 +99,53 @@ public class Controller {
 
     private HBox createBookCard(long readerId, Book book) {
         HBox card = new HBox(10);
+        card.setAlignment(Pos.CENTER_LEFT);
         card.setStyle("""
-                -fx-padding: 10;
-                -fx-background-color: white;
-                -fx-border-color: #dcdcdc;
-                -fx-border-radius: 6;
-                -fx-background-radius: 6;
-                """);
+            -fx-padding: 10;
+            -fx-background-color: white;
+            -fx-border-color: #dcdcdc;
+            -fx-border-radius: 6;
+            -fx-background-radius: 6;
+            """);
+
+        // Щоб картка займала всю доступну ширину (і ресайзилась разом зі списком)
+        card.setMinWidth(0);
+        card.setMaxWidth(Double.MAX_VALUE);
+        if (booksContainer != null) {
+            // мінус padding контейнера (підкоригуйте, якщо у вас інші відступи)
+            card.prefWidthProperty().bind(booksContainer.widthProperty().subtract(20));
+        }
 
         Label title = new Label(book.getTitle());
         title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        title.setMinWidth(0);
+        title.setMaxWidth(Double.MAX_VALUE);
+        title.setWrapText(false);
+        title.setTextOverrun(javafx.scene.control.OverrunStyle.ELLIPSIS);
+        HBox.setHgrow(title, Priority.ALWAYS);
 
-        // status label
         Label statusLabel = new Label(book.getStatus() == null ? STATUS_WANT : book.getStatus());
         statusLabel.setStyle(statusStyle(statusLabel.getText()));
+        statusLabel.setMinWidth(120);
+        statusLabel.setPrefWidth(120);
+        statusLabel.setMaxWidth(120);
+        statusLabel.setAlignment(Pos.CENTER_LEFT);
+
+        boolean fav = bookDao.isFavorite(readerId, book.getId());
+
+        Button favBtn = new Button(fav ? "★" : "☆");
+        setFixedButton(favBtn, 35);
 
         Button sessionsBtn = new Button("Sessions");
-        sessionsBtn.setOnAction(e -> loadReadingSessionsForBook(book));
+        setFixedButton(sessionsBtn, 80);
 
         Button addSessionBtn = new Button("+");
+        setFixedButton(addSessionBtn, 32);
+
+        Button deleteBtn = new Button("Delete");
+        setFixedButton(deleteBtn, 70);
+
+        sessionsBtn.setOnAction(e -> loadReadingSessionsForBook(book));
 
         if (isBookFinished(readerId, book)) {
             addSessionBtn.setDisable(true);
@@ -124,29 +153,13 @@ public class Controller {
             addSessionBtn.setOnAction(e -> openReadingSessionDialog(book, null));
         }
 
-        Button deleteBtn = new Button("Delete");
         deleteBtn.setOnAction(e -> deleteBook(book));
-
-        HBox spacer = new HBox();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        boolean fav = bookDao.isFavorite(readerId, book.getId());
-
-        Button favBtn = new Button(fav ? "★" : "☆");
-        favBtn.setMinWidth(35);
-        favBtn.setPrefWidth(35);
-        favBtn.setMaxWidth(35);
 
         favBtn.setOnAction(e -> {
             try {
-                boolean makeFav = "☆".equals(favBtn.getText());
-                if (makeFav) {
-                    bookDao.addFavorite(readerId, book.getId());
-                    favBtn.setText("★");
-                } else {
-                    bookDao.removeFavorite(readerId, book.getId());
-                    favBtn.setText("☆");
-                }
+                boolean makeFavNow = "☆".equals(favBtn.getText());
+                if (makeFavNow) bookDao.addFavorite(readerId, book.getId());
+                else bookDao.removeFavorite(readerId, book.getId());
                 refreshMyBooksCards();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -154,8 +167,27 @@ public class Controller {
             }
         });
 
-        card.getChildren().addAll(title, statusLabel, spacer, favBtn, sessionsBtn, addSessionBtn, deleteBtn);
+        HBox left = new HBox(10, title);
+        left.setAlignment(Pos.CENTER_LEFT);
+        left.setMinWidth(0);
+        HBox.setHgrow(left, Priority.ALWAYS);
+
+        HBox right = new HBox(8, statusLabel, favBtn, sessionsBtn, addSessionBtn, deleteBtn);
+        right.setAlignment(Pos.CENTER_RIGHT);
+        right.setMinWidth(Region.USE_PREF_SIZE);
+        right.setMaxWidth(Region.USE_PREF_SIZE);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        card.getChildren().setAll(left, spacer, right);
         return card;
+    }
+
+    private void setFixedButton(Button btn, double width) {
+        btn.setMinWidth(width);
+        btn.setPrefWidth(width);
+        btn.setMaxWidth(width);
     }
 
     private String statusStyle(String status) {

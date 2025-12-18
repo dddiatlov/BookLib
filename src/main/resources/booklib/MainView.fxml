@@ -6,7 +6,7 @@
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="booklib.Controller"
-            prefWidth="900"
+            prefWidth="1200"
             prefHeight="600">
 
     <!-- TOP BAR -->
@@ -30,56 +30,44 @@
 
     <!-- MAIN CONTENT -->
     <center>
-        <HBox spacing="12"
-              style="-fx-padding: 12; -fx-background-color: #f3f3f3;">
+        <SplitPane dividerPositions="0.62"
+                   style="-fx-padding: 12; -fx-background-color: #f3f3f3;"
+                   BorderPane.alignment="CENTER">
 
             <!-- LEFT: BOOKS -->
-            <VBox spacing="10" prefWidth="520">
+            <VBox spacing="10" minWidth="320">
 
-                <!-- HEADER ROW -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
-
-                    <!-- My Books controls -->
                     <Label fx:id="myBooksLabel"
                            text="My Books"
-                           style="-fx-font-size: 16px;
-                                  -fx-font-weight: bold;"/>
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
                     <Button fx:id="addBookButton"
                             text="+ Add Book"
                             onAction="#onAddBook"/>
 
-
-
                     <Button text="Import CSV"
                             onAction="#onImportCsv"/>
-
                 </HBox>
 
-                <!-- MY BOOKS LIST -->
                 <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
                     <content>
                         <VBox fx:id="booksContainer"
                               spacing="15"
-                              style="-fx-background-color: #f9f9f9;
-                                     -fx-padding: 10;">
-                            <!-- book cards added programmatically -->
-                        </VBox>
+                              style="-fx-background-color: #f9f9f9; -fx-padding: 10;"/>
                     </content>
                 </ScrollPane>
-
             </VBox>
 
             <!-- RIGHT: READING SESSIONS -->
-            <VBox spacing="10" prefWidth="340">
+            <VBox spacing="10" minWidth="125">
                 <Label text="Reading Sessions"
-                       style="-fx-font-size: 16px;
-                              -fx-font-weight: bold;"/>
-                <ListView fx:id="readingSessionsListView"
-                          VBox.vgrow="ALWAYS"/>
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 0 10;"/>
+
+                <ListView fx:id="readingSessionsListView" VBox.vgrow="ALWAYS"/>
             </VBox>
 
-        </HBox>
+        </SplitPane>
     </center>
 
 </BorderPane>
