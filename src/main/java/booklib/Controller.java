@@ -61,7 +61,7 @@ public class Controller {
         prefs.putBoolean("theme.dark", dark);
 
         applyTheme(dark);
-        themeToggle.setText(dark ? "LightLight" : "Dark");
+        themeToggle.setText(dark ? "Light" : "Dark");
     }
 
     private void applyTheme(boolean dark) {

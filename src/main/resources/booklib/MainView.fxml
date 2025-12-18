@@ -44,7 +44,8 @@
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label fx:id="myBooksLabel"
                            text="My Books"
-                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;-fx-text-fill: darkblue"/>
 
                     <Button fx:id="addBookButton"
                             text="+ Add Book"
@@ -58,7 +59,7 @@
                     <content>
                         <VBox fx:id="booksContainer"
                               spacing="15"
-                              style="-fx-background-color: #f9f9f9; -fx-padding: 10;"/>
+                              style="-fx-background-color: darkgrey; -fx-padding: 10;"/>
                     </content>
                 </ScrollPane>
             </VBox>
@@ -66,7 +67,7 @@
             <!-- RIGHT: READING SESSIONS -->
             <VBox spacing="10" minWidth="125">
                 <Label text="Reading Sessions"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 0 10;"/>
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 0 10; -fx-text-fill: darkblue"/>
 
                 <ListView fx:id="readingSessionsListView" VBox.vgrow="ALWAYS"/>
             </VBox>
