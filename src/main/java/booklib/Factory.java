@@ -9,6 +9,9 @@ import booklib.readingSessions.ReadingSessionDao;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import booklib.review.MysqlReviewDao;
+import booklib.review.ReviewDao;
+
 
 public enum Factory {
     INSTANCE;
@@ -20,6 +23,14 @@ public enum Factory {
     private volatile BookDao bookDao;
     private volatile ReaderDao readerDao;
     private volatile ReadingSessionDao readingSessionDao;
+    private ReviewDao reviewDao;
+
+    public ReviewDao getReviewDao() {
+        if (reviewDao == null) {
+            reviewDao = new MysqlReviewDao(jdbcOperations); // имя поля у тебя может быть другое
+        }
+        return reviewDao;
+    }
 
     public JdbcOperations getMysqlJdbcOperations() {
         if (jdbcOperations == null) {
@@ -27,7 +38,7 @@ public enum Factory {
                 if (jdbcOperations == null) {
                     MysqlDataSource ds = new MysqlDataSource();
 
-                    ds.setURL("jdbc:mysql://localhost:3306/bookLib" +
+                    ds.setURL("jdbc:mysql://localhost:3307/bookLib" +
                             "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
                     ds.setUser("bookLib");
                     ds.setPassword("bookLib");

@@ -1,10 +1,11 @@
 package booklib;
-
+import booklib.review.ReviewController;
+import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-
 import booklib.books.Book;
 import booklib.books.BookDao;
 import booklib.readingSessions.ReadingSession;
@@ -12,7 +13,6 @@ import booklib.readingSessions.ReadingSessionController;
 import booklib.readingSessions.ReadingSessionDao;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,7 +22,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import booklib.books.AddBookController;
-
 import java.util.List;
 
 public class Controller {
@@ -64,6 +63,24 @@ public class Controller {
 
         loadAllBooks();
         refreshMyBooksCards();
+    }
+    public void openReviewWindow(Book book, Node anyNodeInCurrentScene) {
+        try {
+            var loader = new javafx.fxml.FXMLLoader(getClass().getResource("/booklib/ReviewView.fxml"));
+            var root = loader.load();
+
+            ReviewController c = loader.getController();
+            c.setBook(book);
+
+            var stage = new javafx.stage.Stage();
+            stage.setTitle("Review");
+            stage.setScene(new javafx.scene.Scene((Parent) root));
+            stage.initOwner(anyNodeInCurrentScene.getScene().getWindow());
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alerts.error("UI error", e.getMessage());
+        }
     }
 
 
@@ -124,6 +141,9 @@ public class Controller {
         Button sessionsBtn = new Button("Sessions");
         sessionsBtn.setOnAction(e -> loadReadingSessionsForBook(book));
 
+        Button reviewBtn = new Button("Review");
+        reviewBtn.setOnAction(e -> openReviewWindow(book, (Node) e.getSource()));
+
         Button addSessionBtn = new Button("+");
         addSessionBtn.setOnAction(e -> openReadingSessionDialog(book, null));
 
@@ -133,7 +153,8 @@ public class Controller {
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        card.getChildren().addAll(title, spacer, sessionsBtn, addSessionBtn, deleteBtn);
+        card.getChildren().addAll(title, spacer, sessionsBtn, addSessionBtn, reviewBtn, deleteBtn);
+
         return card;
     }
 
@@ -285,19 +306,13 @@ public class Controller {
         }
     }
     @FXML
-    public void onLogout() {
+    public void onLogout(ActionEvent event) {
         Session.clear();
 
-        try {
-            SceneSwitcher.switchTo(
-                    "/booklib/LoginView.fxml",
-                    logoutButton
-                        );
-        } catch (Exception e) {
-            e.printStackTrace();
-            Alerts.error("Logout failed", "Unable to return to login screen.");
-        }
+        Node source = (Node) event.getSource(); // это сама кнопка logout
+        SceneSwitcher.switchTo("/booklib/LoginView.fxml", source);
     }
+
 
 
 
