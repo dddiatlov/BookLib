@@ -12,7 +12,6 @@ import booklib.readingSessions.ReadingSessionController;
 import booklib.readingSessions.ReadingSessionDao;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,15 +21,17 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import booklib.books.AddBookController;
+import javafx.geometry.Pos;
 
 import java.util.List;
 
 public class Controller {
-    @FXML
-    private Button logoutButton;
 
     private static final String STATUS_WANT = "WANT_TO_READ";
+    private static final String STATUS_READING = "READING";
+    private static final String STATUS_FINISHED = "FINISHED";
 
+    @FXML private Button logoutButton;
     @FXML private VBox booksContainer;
     @FXML private ListView<ReadingSession> readingSessionsListView;
 
@@ -38,66 +39,25 @@ public class Controller {
     private final ReadingSessionDao readingSessionDao = Factory.INSTANCE.getReadingSessionDao();
 
     @FXML
-    private ListView<Book> allBooksList;
-
-
-
-    @FXML
     public void initialize() {
         setupReadingSessionsListCell();
-
-        // 🔹 красивое отображение книг в All Books
-        allBooksList.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(Book b, boolean empty) {
-                super.updateItem(b, empty);
-                if (empty || b == null) {
-                    setText(null);
-                } else {
-                    setText(b.getTitle()
-                            + (b.getAuthor() != null && !b.getAuthor().isBlank()
-                            ? " — " + b.getAuthor()
-                            : ""));
-                }
-            }
-        });
-
-        loadAllBooks();
         refreshMyBooksCards();
     }
-
-
-    private void loadAllBooks() {
-        allBooksList.getItems().setAll(bookDao.findAll());
-    }
-    @FXML
-    public void onAddToMyBooks() {
-        Book book = allBooksList.getSelectionModel().getSelectedItem();
-        if (book == null) {
-            Alerts.error("Select a book", "Please select a book first.");
-            return;
-        }
-
-        Long readerId = Session.getCurrentReader().getId();
-        bookDao.addBookForReader(book.getId(), readerId, "WANT_TO_READ");
-
-        refreshMyBooksCards();
-    }
-
-
-    /* =========================
-       BOOKS (cards in VBox)
-       ========================= */
 
     private void refreshMyBooksCards() {
         try {
             Long readerId = Long.valueOf(Session.requireReaderId());
             List<Book> books = bookDao.findByReaderId(readerId);
 
+            // keep status correct (computed from sessions)
+            for (Book b : books) {
+                syncBookStatus(readerId, b);
+            }
+
             booksContainer.getChildren().clear();
 
             for (Book book : books) {
-                booksContainer.getChildren().add(createBookCard(book));
+                booksContainer.getChildren().add(createBookCard(readerId, book));
             }
 
             readingSessionsListView.getItems().clear();
@@ -108,7 +68,7 @@ public class Controller {
         }
     }
 
-    private HBox createBookCard(Book book) {
+    private HBox createBookCard(Long readerId, Book book) {
         HBox card = new HBox(10);
         card.setStyle("""
                 -fx-padding: 10;
@@ -121,11 +81,20 @@ public class Controller {
         Label title = new Label(book.getTitle());
         title.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
 
+        // status label
+        Label statusLabel = new Label(book.getStatus() == null ? STATUS_WANT : book.getStatus());
+        statusLabel.setStyle(statusStyle(statusLabel.getText()));
+
         Button sessionsBtn = new Button("Sessions");
         sessionsBtn.setOnAction(e -> loadReadingSessionsForBook(book));
 
         Button addSessionBtn = new Button("+");
-        addSessionBtn.setOnAction(e -> openReadingSessionDialog(book, null));
+
+        if (isBookFinished(readerId, book)) {
+            addSessionBtn.setDisable(true);
+        } else {
+            addSessionBtn.setOnAction(e -> openReadingSessionDialog(book, null));
+        }
 
         Button deleteBtn = new Button("Delete");
         deleteBtn.setOnAction(e -> deleteBook(book));
@@ -133,8 +102,16 @@ public class Controller {
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        card.getChildren().addAll(title, spacer, sessionsBtn, addSessionBtn, deleteBtn);
+        card.getChildren().addAll(title, statusLabel, spacer, sessionsBtn, addSessionBtn, deleteBtn);
         return card;
+    }
+
+    private String statusStyle(String status) {
+        return switch (status) {
+            case STATUS_FINISHED -> "-fx-text-fill: #1b7f2a; -fx-font-weight: bold;";
+            case STATUS_READING -> "-fx-text-fill: #c47f00; -fx-font-weight: bold;";
+            default -> "-fx-text-fill: #666666; -fx-font-weight: bold;";
+        };
     }
 
     private void deleteBook(Book book) {
@@ -166,6 +143,10 @@ public class Controller {
             long readerId = Session.requireReaderId();
             var sessions = readingSessionDao.findByReaderIdAndBookId(readerId, book.getId());
             readingSessionsListView.getItems().setAll(sessions);
+
+            // also keep status synced whenever sessions are viewed
+            syncBookStatus(readerId, book);
+
         } catch (Exception e) {
             e.printStackTrace();
             Alerts.error("DB error", e.getMessage());
@@ -174,23 +155,39 @@ public class Controller {
 
     private void setupReadingSessionsListCell() {
         readingSessionsListView.setCellFactory(list -> new ListCell<>() {
+
+            private final Label lbl = new Label();
+            private final Button editBtn = new Button("Edit");
+            private final Button delBtn = new Button("Delete");
+            private final HBox box = new HBox(6, lbl, editBtn, delBtn);
+
+            {
+                lbl.setWrapText(true);
+                lbl.setMinWidth(0);
+                lbl.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(lbl, Priority.ALWAYS);
+
+                setFixedButton(editBtn, 40);
+                setFixedButton(delBtn, 55);
+
+                box.setAlignment(Pos.CENTER_LEFT);
+                setPrefWidth(0);
+            }
+
             @Override
             protected void updateItem(ReadingSession item, boolean empty) {
                 super.updateItem(item, empty);
 
                 if (empty || item == null) {
-                    setText(null);
                     setGraphic(null);
+                    setText(null);
                     return;
                 }
 
-                Label lbl = new Label(item.toString());
-                HBox.setHgrow(lbl, Priority.ALWAYS);
+                lbl.setText(item.toString());
 
-                Button editBtn = new Button("Edit");
                 editBtn.setOnAction(e -> openReadingSessionDialog(item.getBook(), item));
 
-                Button delBtn = new Button("Delete");
                 delBtn.setOnAction(e -> {
                     var confirm = new Alert(Alert.AlertType.CONFIRMATION,
                             "Delete this session?\n\n" + item,
@@ -201,8 +198,14 @@ public class Controller {
                     if (res.isPresent() && res.get() == ButtonType.YES) {
                         try {
                             readingSessionDao.delete(item.getId());
+
                             Book b = item.getBook();
-                            if (b != null) loadReadingSessionsForBook(b);
+                            if (b != null) {
+                                long readerId = Session.requireReaderId();
+                                syncBookStatus(readerId, b);
+                                refreshMyBooksCards();
+                                loadReadingSessionsForBook(b);
+                            }
                         } catch (Exception ex) {
                             ex.printStackTrace();
                             Alerts.error("DB error", ex.getMessage());
@@ -210,8 +213,13 @@ public class Controller {
                     }
                 });
 
-                HBox box = new HBox(10, lbl, editBtn, delBtn);
                 setGraphic(box);
+            }
+
+            private void setFixedButton(Button btn, double width) {
+                btn.setMinWidth(width);
+                btn.setPrefWidth(width);
+                btn.setMaxWidth(width);
             }
         });
     }
@@ -231,6 +239,10 @@ public class Controller {
             st.setScene(new Scene(root));
             st.showAndWait();
 
+            // after dialog: recalc status + refresh UI + reload sessions
+            long readerId = Session.requireReaderId();
+            syncBookStatus(readerId, book);
+            refreshMyBooksCards();
             loadReadingSessionsForBook(book);
 
         } catch (Exception e) {
@@ -238,6 +250,42 @@ public class Controller {
             Alerts.error("UI error", e.getMessage());
         }
     }
+
+    /**
+     * Computes and persists correct status for (reader, book) based on reading sessions.
+     */
+    private void syncBookStatus(long readerId, Book book) {
+        if (book == null || book.getId() == null) return;
+
+        int totalRead = readingSessionDao.sumPagesForReaderAndBook(readerId, book.getId());
+        int totalPages = Math.max(0, book.getPages());
+
+        String status;
+        if (totalRead <= 0) status = STATUS_WANT;
+        else if (totalRead >= totalPages && totalPages > 0) status = STATUS_FINISHED;
+        else status = STATUS_READING;
+
+        // persist into book_status (your method is UPSERT)
+        bookDao.addBookForReader(book.getId(), readerId, status);
+
+        // keep object consistent for UI
+        book.setStatus(status);
+    }
+
+    private boolean isBookFinished(long readerId, Book book) {
+        if (book == null || book.getId() == null) return false;
+
+        int totalPages = Math.max(0, book.getPages());
+        if (totalPages == 0) return false; // safety
+
+        int totalRead = readingSessionDao.sumPagesForReaderAndBook(readerId, book.getId());
+        return totalRead >= totalPages;
+    }
+
+    /* =========================
+       BOOKS
+       ========================= */
+
     @FXML
     public void onAddBook() {
         try {
@@ -253,7 +301,7 @@ public class Controller {
             st.showAndWait();
 
             if (c.isSaved()) {
-                refreshMyBooksCards(); // обновить карточки сразу после добавления
+                refreshMyBooksCards();
             }
 
         } catch (Exception e) {
@@ -261,6 +309,7 @@ public class Controller {
             Alerts.error("UI error", e.getMessage());
         }
     }
+
     @FXML
     public void onImportCsv() {
         try (InputStream in = getClass().getResourceAsStream("/booklib/books.csv")) {
@@ -269,21 +318,18 @@ public class Controller {
                 return;
             }
 
-            // копируем ресурс во временный файл, чтобы использовать твой существующий loadFromCsv(File)
             Path tmp = Files.createTempFile("booklib-books-", ".csv");
             Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
 
             int loaded = bookDao.loadFromCsv(tmp.toFile());
 
             Alerts.info("CSV import", "Loaded: " + loaded + " books.");
-            // обнови UI если нужно:
-            // refreshAllBooksCards(); или refreshMyBooksCards(); — что у тебя есть
-
         } catch (Exception e) {
             e.printStackTrace();
             Alerts.error("CSV import error", e.getMessage());
         }
     }
+
     @FXML
     public void onLogout() {
         Session.clear();
@@ -292,16 +338,10 @@ public class Controller {
             SceneSwitcher.switchTo(
                     "/booklib/LoginView.fxml",
                     logoutButton
-                        );
+            );
         } catch (Exception e) {
             e.printStackTrace();
             Alerts.error("Logout failed", "Unable to return to login screen.");
         }
     }
-
-
-
-
-
 }
-

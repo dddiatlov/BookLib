@@ -16,6 +16,19 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
 
     private final JdbcOperations jdbcOperations;
 
+    private static final String SELECT_QUERY =
+            "SELECT " +
+                    "rs.id AS rs_id, rs.pages_read AS rs_pages_read, rs.duration_minutes AS rs_duration_minutes, rs.created_at AS rs_created_at, " +
+                    "r.id AS r_id, r.name AS r_name, r.password_hash AS r_password_hash, r.created_at AS r_created_at, " +
+                    "b.id AS b_id, b.title AS b_title, b.author AS b_author, b.pages AS b_pages, b.genre AS b_genre, b.language AS b_language, b.created_at AS b_created_at " +
+                    "FROM reading_session rs " +
+                    "JOIN reader r ON rs.reader_id = r.id " +
+                    "JOIN book b ON rs.book_id = b.id";
+
+    public MysqlReadingSessionDao(JdbcOperations jdbcOperations) {
+        this.jdbcOperations = jdbcOperations;
+    }
+
     private final ResultSetExtractor<List<ReadingSession>> resultSetExtractor = rs -> {
         var sessions = new ArrayList<ReadingSession>();
         var processedSessions = new HashMap<Long, ReadingSession>();
@@ -32,14 +45,14 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
             }
 
             long readerId = rs.getLong("r_id");
-            Reader reader = processedReaders.get(readerId);
+            var reader = processedReaders.get(readerId);
             if (reader == null) {
                 reader = Reader.fromResultSet(rs, "r_");
                 processedReaders.put(readerId, reader);
             }
 
             long bookId = rs.getLong("b_id");
-            Book book = processedBooks.get(bookId);
+            var book = processedBooks.get(bookId);
             if (book == null) {
                 book = Book.fromResultSet(rs, "b_");
                 processedBooks.put(bookId, book);
@@ -48,22 +61,8 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
             session.setReader(reader);
             session.setBook(book);
         }
-
         return sessions;
     };
-
-    private static final String SELECT_QUERY =
-            "SELECT " +
-                    "rs.id AS rs_id, rs.pages_read AS rs_pages_read, rs.duration_minutes AS rs_duration_minutes, rs.created_at AS rs_created_at, " +
-                    "r.id AS r_id, r.name AS r_name, r.password_hash AS r_password_hash, r.created_at AS r_created_at, " +
-                    "b.id AS b_id, b.title AS b_title, b.author AS b_author, b.pages AS b_pages, b.genre AS b_genre, b.language AS b_language, b.created_at AS b_created_at " +
-                    "FROM reading_session rs " +
-                    "JOIN reader r ON rs.reader_id = r.id " +
-                    "JOIN book b ON rs.book_id = b.id";
-
-    public MysqlReadingSessionDao(JdbcOperations jdbcOperations) {
-        this.jdbcOperations = jdbcOperations;
-    }
 
     @Override
     public List<ReadingSession> findAll() {
@@ -101,8 +100,8 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
 
         var keyHolder = new GeneratedKeyHolder();
 
-        jdbcOperations.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(
+        jdbcOperations.update(con -> {
+            PreparedStatement ps = con.prepareStatement(
                     "INSERT INTO reading_session (reader_id, book_id, pages_read, duration_minutes, created_at) " +
                             "VALUES (?, ?, ?, ?, ?)",
                     new String[]{"id"}
@@ -111,14 +110,12 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
             ps.setLong(2, session.getBook().getId());
             ps.setInt(3, session.getPagesRead());
             ps.setInt(4, session.getDurationMinutes());
-            ps.setTimestamp(5, java.sql.Timestamp.valueOf(
-                    session.getCreatedAt() != null ? session.getCreatedAt() : java.time.LocalDateTime.now()
-            ));
+            ps.setTimestamp(5, java.sql.Timestamp.valueOf(session.getCreatedAt()));
             return ps;
         }, keyHolder);
 
-        long id = keyHolder.getKey().longValue();
-        return findById(id);
+        session.setId(keyHolder.getKey().longValue());
+        return session;
     }
 
     @Override
@@ -129,26 +126,33 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
         if (session.getBook() == null || session.getBook().getId() == null) throw new IllegalArgumentException("Book is not set");
 
         int updated = jdbcOperations.update(
-                "UPDATE reading_session " +
-                        "SET reader_id = ?, book_id = ?, pages_read = ?, duration_minutes = ?, created_at = ? " +
-                        "WHERE id = ?",
+                "UPDATE reading_session SET reader_id=?, book_id=?, pages_read=?, duration_minutes=?, created_at=? WHERE id=?",
                 session.getReader().getId(),
                 session.getBook().getId(),
                 session.getPagesRead(),
                 session.getDurationMinutes(),
-                java.sql.Timestamp.valueOf(session.getCreatedAt() != null ? session.getCreatedAt() : java.time.LocalDateTime.now()),
+                java.sql.Timestamp.valueOf(session.getCreatedAt()),
                 session.getId()
         );
 
-        if (updated != 1) {
-            throw new NotFoundException("Reading session with id " + session.getId() + " not found");
-        }
-
-        return findById(session.getId());
+        if (updated == 0) throw new NotFoundException("Reading session with id " + session.getId() + " not found");
+        return session;
     }
 
     @Override
     public void delete(Long id) {
-        jdbcOperations.update("DELETE FROM reading_session WHERE id = ?", id);
+        int deleted = jdbcOperations.update("DELETE FROM reading_session WHERE id = ?", id);
+        if (deleted == 0) throw new NotFoundException("Reading session with id " + id + " not found");
+    }
+
+    @Override
+    public int sumPagesForReaderAndBook(long readerId, long bookId) {
+        Integer sum = jdbcOperations.queryForObject(
+                "SELECT COALESCE(SUM(pages_read), 0) FROM reading_session WHERE reader_id = ? AND book_id = ?",
+                Integer.class,
+                readerId,
+                bookId
+        );
+        return sum == null ? 0 : sum;
     }
 }

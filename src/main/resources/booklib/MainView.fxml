@@ -39,21 +39,6 @@
                 <!-- HEADER ROW -->
                 <HBox spacing="12" alignment="CENTER_LEFT">
 
-                    <!-- All Books компактно -->
-                    <VBox spacing="6" prefWidth="240" maxWidth="240">
-                        <Label text="All Books"
-                               style="-fx-font-size: 12px; -fx-text-fill: #555;"/>
-
-                        <HBox spacing="8" alignment="CENTER_LEFT">
-                            <ListView fx:id="allBooksList"
-                                      prefHeight="90"
-                                      prefWidth="180"/>
-                            <Button text="Add"
-                                    prefWidth="50"
-                                    onAction="#onAddToMyBooks"/>
-                        </HBox>
-                    </VBox>
-
                     <!-- My Books controls -->
                     <Label fx:id="myBooksLabel"
                            text="My Books"

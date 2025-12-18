@@ -4,18 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="логин реализован">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
+    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="привели проект BookLib в рабочее состояние на Java 17&#10;&#10;починили Maven + JavaFX + Lombok и устранили ошибки старта&#10;&#10;правильно связали FXML ↔ Controller (исчезли NullPointerException)&#10;&#10;разобрались, что падение было из-за MySQL, а не из-за Java&#10;&#10;настроили доступ к базе данных (пользователь, права, подключение)&#10;&#10;запустили приложение без краша и увидели рабочее главное окно&#10;&#10;убедились, что кнопки нажимаются, просто логика ещё не реализована&#10;&#10;поняли текущую стадию проекта и оценили прогресс (~70% готово)">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/init.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Controller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/SceneSwitcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/SceneSwitcher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/MysqlBookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/MysqlBookDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Factory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Factory.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/AddBookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/AddBookController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/MysqlReadingSessionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/MysqlReadingSessionDao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/booklib/AddBookView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/booklib/AddBookView.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/booklib/MainView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/booklib/MainView.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/booklib/ReadingSessionView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/booklib/ReadingSessionView.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +45,7 @@
     </excluded-from-favorite>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="WORKINGbranch_denys" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -56,12 +56,12 @@
     &quot;assignee&quot;: &quot;dddiatlov&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/dddiatlov/BookLib.git&quot;,
-    &quot;accountId&quot;: &quot;6938e6ad-c4b0-484a-a0d2-173fba2a6874&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/dddiatlov/BookLib.git",
+    "accountId": "6a68dd36-cf5c-46ca-85d2-296340fc09b0"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -70,33 +70,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.IDELauncher.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.bookLib [clean].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;WORKINGbranch__denys&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/slurp/IdeaProjects/BookLib/src/main/resources/booklib&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Global Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.IDELauncher.executor": "Run",
+    "Application.Main.executor": "Run",
+    "Maven.bookLib [clean].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "WORKINGbranch__without__duplicates",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/slurp/IdeaProjects/BookLib/src/main/resources/booklib",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\slurp\IdeaProjects\BookLib\src\main\resources\booklib" />
@@ -133,16 +134,14 @@
       <list>
         <item itemvalue="Application.IDELauncher" />
         <item itemvalue="Application.Main" />
-        <item itemvalue="Application.IDELauncher" />
-        <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.26830.84" />
+        <option value="bundled-jdk-30f59d01ecdd-cffe25b9f5b3-intellij.indexing.shared.core-IU-253.28294.334" />
+        <option value="bundled-js-predefined-d6986cc7102b-c7e53b3be11b-JavaScript-IU-253.28294.334" />
       </set>
     </attachedChunks>
   </component>
@@ -170,9 +169,7 @@
       <workItem from="1765635783724" duration="4024000" />
       <workItem from="1765640482146" duration="1099000" />
       <workItem from="1765642571259" duration="1552000" />
-      <workItem from="1765923460970" duration="3731000" />
-      <workItem from="1766003403339" duration="11420000" />
-      <workItem from="1766018075659" duration="3571000" />
+      <workItem from="1766072223649" duration="2679000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -222,23 +219,7 @@
       <option name="project" value="LOCAL" />
       <updated>1765377720680</updated>
     </task>
-    <task id="LOCAL-00007" summary="логин реализован">
-      <option name="closed" value="true" />
-      <created>1765923510109</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1765923510109</updated>
-    </task>
-    <task id="LOCAL-00008" summary="логин реализован">
-      <option name="closed" value="true" />
-      <created>1765923539967</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1765923539967</updated>
-    </task>
-    <option name="localTasksCounter" value="9" />
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -255,7 +236,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="WORKINGbranch_denys" />
+                        <option value="17dk" />
                       </list>
                     </value>
                   </entry>
@@ -271,7 +252,6 @@
     <MESSAGE value="init" />
     <MESSAGE value="added book , reader entities (lombok, jdbc dependencies)" />
     <MESSAGE value="привели проект BookLib в рабочее состояние на Java 17&#10;&#10;починили Maven + JavaFX + Lombok и устранили ошибки старта&#10;&#10;правильно связали FXML ↔ Controller (исчезли NullPointerException)&#10;&#10;разобрались, что падение было из-за MySQL, а не из-за Java&#10;&#10;настроили доступ к базе данных (пользователь, права, подключение)&#10;&#10;запустили приложение без краша и увидели рабочее главное окно&#10;&#10;убедились, что кнопки нажимаются, просто логика ещё не реализована&#10;&#10;поняли текущую стадию проекта и оценили прогресс (~70% готово)" />
-    <MESSAGE value="логин реализован" />
-    <option name="LAST_COMMIT_MESSAGE" value="логин реализован" />
+    <option name="LAST_COMMIT_MESSAGE" value="привели проект BookLib в рабочее состояние на Java 17&#10;&#10;починили Maven + JavaFX + Lombok и устранили ошибки старта&#10;&#10;правильно связали FXML ↔ Controller (исчезли NullPointerException)&#10;&#10;разобрались, что падение было из-за MySQL, а не из-за Java&#10;&#10;настроили доступ к базе данных (пользователь, права, подключение)&#10;&#10;запустили приложение без краша и увидели рабочее главное окно&#10;&#10;убедились, что кнопки нажимаются, просто логика ещё не реализована&#10;&#10;поняли текущую стадию проекта и оценили прогресс (~70% готово)" />
   </component>
 </project>

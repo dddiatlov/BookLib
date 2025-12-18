@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -8,36 +7,38 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="booklib.books.AddBookController"
       spacing="12"
-      prefWidth="420"
+      prefWidth="520"
       style="-fx-padding: 16; -fx-background-color: white;">
 
     <Label text="Add Book"
            style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
 
+    <Label text="Select a book from the catalog (imported from books.csv)." />
+
     <GridPane hgap="10" vgap="10">
         <columnConstraints>
-            <ColumnConstraints prefWidth="110"/>
+            <ColumnConstraints prefWidth="120"/>
             <ColumnConstraints hgrow="ALWAYS"/>
         </columnConstraints>
 
-        <Label text="Title:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-        <TextField fx:id="titleField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <Label text="Book:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="bookCombo" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
         <Label text="Author:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <TextField fx:id="authorField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Label fx:id="authorValue" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
         <Label text="Pages:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <TextField fx:id="pagesField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <Label fx:id="pagesValue" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
         <Label text="Genre:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <TextField fx:id="genreField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Label fx:id="genreValue" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
         <Label text="Language:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="languageCombo" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <Label fx:id="languageValue" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
     </GridPane>
 
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button text="Cancel" onAction="#onCancel"/>
-        <Button text="Save" defaultButton="true" onAction="#onSave"/>
+        <Button text="Add" defaultButton="true" onAction="#onSave"/>
     </HBox>
 </VBox>

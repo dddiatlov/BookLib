@@ -13,9 +13,11 @@ import java.time.LocalDateTime;
 
 public class ReadingSessionController {
 
-    private final ReadingSessionDao sessionDao = Factory.INSTANCE.getReadingSessionDao();
+    private final ReadingSessionDao readingSessionDao = Factory.INSTANCE.getReadingSessionDao();
 
     @FXML private Label headerLabel;
+    @FXML private Label limitLabel;
+
     @FXML private DatePicker datePicker;
     @FXML private TextField pagesReadField;
     @FXML private TextField durationField;
@@ -26,13 +28,17 @@ public class ReadingSessionController {
 
     public void setBook(Book book) {
         this.book = book;
+
         if (headerLabel != null && book != null) {
             headerLabel.setText("Reading session for: " + book.getTitle());
         }
+
+        applyInputConstraints();
     }
 
     public void setEditingSession(ReadingSession session) {
         this.editingSession = session;
+
         if (session != null) {
             if (datePicker != null && session.getCreatedAt() != null) {
                 datePicker.setValue(session.getCreatedAt().toLocalDate());
@@ -40,12 +46,110 @@ public class ReadingSessionController {
             if (pagesReadField != null) pagesReadField.setText(String.valueOf(session.getPagesRead()));
             if (durationField != null) durationField.setText(String.valueOf(session.getDurationMinutes()));
         }
+
+        applyInputConstraints();
     }
 
     @FXML
     private void initialize() {
         if (datePicker != null) {
             datePicker.setValue(LocalDate.now());
+        }
+        applyInputConstraints(); // safe even before book is set
+    }
+
+    private void applyInputConstraints() {
+        // digits-only for duration
+        if (durationField != null) {
+            durationField.setTextFormatter(digitsOnlyFormatter());
+        }
+
+        // pages: depends on remaining pages for this book
+        if (pagesReadField != null) {
+            if (book == null) {
+                pagesReadField.setTextFormatter(digitsOnlyFormatter());
+                if (limitLabel != null) limitLabel.setText("");
+                return;
+            }
+
+            int remaining = remainingPagesForThisBook();
+
+            if (remaining <= 0) {
+                pagesReadField.setText("0");
+                pagesReadField.setDisable(true);
+                saveButton.setDisable(true);
+                if (limitLabel != null) {
+                    limitLabel.setText("No pages remaining. Book is already finished.");
+                }
+                return;
+            }
+
+            pagesReadField.setDisable(false);
+            saveButton.setDisable(false);
+
+            pagesReadField.setTextFormatter(rangedIntFormatter(1, remaining));
+            if (limitLabel != null) {
+                limitLabel.setText("You can add at most: " + remaining + " pages in this session.");
+            }
+
+            // clamp typed/loaded value to range
+            clampFieldToRange(pagesReadField, 1, remaining);
+        }
+    }
+
+    /**
+     * Remaining pages you are allowed to record in THIS session.
+     * (book.pages - alreadyRecordedPages). If editing, exclude edited session's old pages.
+     */
+    private int remainingPagesForThisBook() {
+        long readerId = Session.requireReaderId();
+        int bookPages = Math.max(0, book.getPages());
+
+        int alreadyRead = readingSessionDao.sumPagesForReaderAndBook(readerId, book.getId());
+
+        // If editing: remove old pages of this session from the total
+        if (editingSession != null && editingSession.getId() != null) {
+            alreadyRead -= editingSession.getPagesRead();
+            if (alreadyRead < 0) alreadyRead = 0;
+        }
+
+        return Math.max(0, bookPages - alreadyRead);
+    }
+
+    private TextFormatter<String> digitsOnlyFormatter() {
+        return new TextFormatter<>(change -> {
+            String t = change.getControlNewText();
+            if (t.isBlank()) return change;
+            return t.matches("\\d{0,9}") ? change : null;
+        });
+    }
+
+    private TextFormatter<String> rangedIntFormatter(int min, int max) {
+        return new TextFormatter<>(change -> {
+            String t = change.getControlNewText();
+            if (t.isBlank()) return change; // allow clearing while typing
+            if (!t.matches("\\d{0,9}")) return null;
+
+            try {
+                int v = Integer.parseInt(t);
+                if (v < min || v > max) return null; // block out-of-range
+            } catch (NumberFormatException ex) {
+                return null;
+            }
+            return change;
+        });
+    }
+
+    private void clampFieldToRange(TextField field, int min, int max) {
+        String t = field.getText();
+        if (t == null || t.isBlank()) return;
+        try {
+            int v = Integer.parseInt(t.trim());
+            if (v < min) v = min;
+            if (v > max) v = max;
+            field.setText(String.valueOf(v));
+        } catch (Exception ignored) {
+            field.clear();
         }
     }
 
@@ -73,8 +177,21 @@ public class ReadingSessionController {
             return;
         }
 
-        if (pages <= 0) { showError("Pages read must be greater than 0."); return; }
-        if (minutes <= 0) { showError("Duration must be greater than 0 minutes."); return; }
+        if (minutes <= 0) {
+            showError("Duration must be greater than 0 minutes.");
+            return;
+        }
+
+        // HARD LIMIT (prevents 150 + 350 case)
+        int remaining = remainingPagesForThisBook();
+        if (remaining <= 0) {
+            showError("Book is already finished. You cannot add more pages.");
+            return;
+        }
+        if (pages < 1 || pages > remaining) {
+            showError("You can add at most " + remaining + " pages for this book.");
+            return;
+        }
 
         LocalDateTime createdAt;
         LocalDate d = datePicker.getValue();
@@ -90,19 +207,19 @@ public class ReadingSessionController {
                 session.setDurationMinutes(minutes);
                 session.setCreatedAt(createdAt);
 
-                sessionDao.create(session);
+                readingSessionDao.create(session);
             } else {
                 editingSession.setPagesRead(pages);
                 editingSession.setDurationMinutes(minutes);
                 editingSession.setCreatedAt(createdAt);
-                // reader/book уже есть, но оставим корректно:
                 editingSession.setReader(r);
                 editingSession.setBook(book);
 
-                sessionDao.update(editingSession);
+                readingSessionDao.update(editingSession);
             }
             close();
         } catch (Exception ex) {
+            ex.printStackTrace();
             showError("Cannot save session: " + ex.getMessage());
         }
     }

@@ -12,9 +12,13 @@
         <Insets top="15" right="15" bottom="15" left="15"/>
     </padding>
 
-    <Label fx:id="bookLabel"
-           text="Book"
+    <Label fx:id="headerLabel"
+           text="Reading session"
            style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+    <Label fx:id="limitLabel"
+           text=""
+           style="-fx-text-fill: #666666; -fx-font-size: 11px;"/>
 
     <TextField fx:id="pagesReadField" promptText="Pages read"/>
     <TextField fx:id="durationField" promptText="Duration (minutes)"/>

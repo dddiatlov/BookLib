@@ -5,32 +5,70 @@ import booklib.Factory;
 import booklib.Session;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+
+import java.util.List;
 
 public class AddBookController {
 
-    private static final String STATUS_WANT = "WANT_TO_READ";
+    private static final String STATUS = "WANT_TO_READ";
 
-    @FXML private TextField titleField;
-    @FXML private TextField authorField;
-    @FXML private TextField pagesField;
-    @FXML private TextField genreField;
-    @FXML private ComboBox<String> languageCombo;
+    // User must select an existing book (loaded from CSV into DB).
+    // No custom book creation from UI.
+    @FXML private ComboBox<Book> bookCombo;
+    @FXML private Label authorValue;
+    @FXML private Label pagesValue;
+    @FXML private Label genreValue;
+    @FXML private Label languageValue;
 
     private final BookDao bookDao = Factory.INSTANCE.getBookDao();
 
-    // чтобы главный контроллер мог понять: добавили или нет
     private boolean saved = false;
-
-    public boolean isSaved() {
-        return saved;
-    }
+    public boolean isSaved() { return saved; }
 
     @FXML
     private void initialize() {
-        languageCombo.getItems().setAll("en", "sk", "ru", "uk", "de", "cs", "pl");
-        languageCombo.getSelectionModel().select("en");
+        List<Book> all = bookDao.findAll();
+        bookCombo.getItems().setAll(all);
+
+        bookCombo.setConverter(new StringConverter<>() {
+            @Override public String toString(Book b) {
+                if (b == null) return "";
+                String a = (b.getAuthor() == null || b.getAuthor().isBlank()) ? "" : (" — " + b.getAuthor());
+                return b.getTitle() + a;
+            }
+            @Override public Book fromString(String string) { return null; }
+        });
+
+        bookCombo.setCellFactory(lv -> new javafx.scene.control.ListCell<>() {
+            @Override protected void updateItem(Book item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) setText(null);
+                else {
+                    String a = (item.getAuthor() == null || item.getAuthor().isBlank()) ? "" : (" — " + item.getAuthor());
+                    setText(item.getTitle() + a);
+                }
+            }
+        });
+
+        bookCombo.valueProperty().addListener((obs, o, n) -> showDetails(n));
+
+        if (!all.isEmpty()) {
+            bookCombo.getSelectionModel().select(0);
+            showDetails(all.get(0));
+        } else {
+            showDetails(null);
+            Alerts.info("No books", "Database has no books yet. Use 'Import CSV' to load /booklib/books.csv.");
+        }
+    }
+
+    private void showDetails(Book b) {
+        authorValue.setText(b == null ? "—" : (b.getAuthor() == null || b.getAuthor().isBlank() ? "—" : b.getAuthor()));
+        pagesValue.setText(b == null ? "—" : String.valueOf(b.getPages()));
+        genreValue.setText(b == null ? "—" : (b.getGenre() == null || b.getGenre().isBlank() ? "—" : b.getGenre()));
+        languageValue.setText(b == null ? "—" : (b.getLanguage() == null || b.getLanguage().isBlank() ? "—" : b.getLanguage()));
     }
 
     @FXML
@@ -38,39 +76,26 @@ public class AddBookController {
         try {
             Long readerId = Long.valueOf(Session.requireReaderId());
 
-            String title = titleField.getText().trim();
-            String author = authorField.getText().trim();
-            String genre = genreField.getText().trim();
-            String lang = (languageCombo.getValue() == null) ? "en" : languageCombo.getValue();
-
-            int pages;
-            try {
-                pages = Integer.parseInt(pagesField.getText().trim());
-            } catch (Exception ex) {
-                Alerts.error("Validation", "Pages must be a number.");
+            Book selected = bookCombo.getValue();
+            if (selected == null || selected.getId() == null) {
+                Alerts.error("Validation", "Please select a book from the list.");
                 return;
             }
 
-            if (title.isBlank()) { Alerts.error("Validation", "Title cannot be empty."); return; }
-            if (genre.isBlank()) { Alerts.error("Validation", "Genre cannot be empty."); return; }
-            if (pages <= 0) { Alerts.error("Validation", "Pages must be > 0."); return; }
+            // Prevent duplicates in My Books
+            List<Book> my = bookDao.findByReaderId(readerId);
+            boolean already = my.stream().anyMatch(b -> b.getId() != null && b.getId().equals(selected.getId()));
+            if (already) {
+                Alerts.info("Already added", "This book is already in 'My Books'.");
+                saved = false;
 
-            Book b = new Book();
-            b.setTitle(title);
-            b.setAuthor(author.isBlank() ? null : author);
-            b.setGenre(genre);
-            b.setPages(pages);
-            b.setLanguage(lang);
-
-            // 1) INSERT into book
-            bookDao.add(b);
-
-            if (b.getId() == null) {
-                throw new IllegalStateException("Book ID is null after bookDao.add(b). Check MysqlBookDao.add(Book) to set generated ID.");
+                // do NOT close the window; let user pick another book
+                bookCombo.requestFocus();
+                return;
             }
 
-            // 2) link in book_status
-            bookDao.addBookForReader(b.getId(), readerId, STATUS_WANT);
+            // Only link existing book to this reader
+            bookDao.addBookForReader(selected.getId(), readerId, STATUS);
 
             saved = true;
             close();
@@ -87,7 +112,7 @@ public class AddBookController {
     }
 
     private void close() {
-        Stage stage = (Stage) titleField.getScene().getWindow();
+        Stage stage = (Stage) bookCombo.getScene().getWindow();
         stage.close();
     }
 }

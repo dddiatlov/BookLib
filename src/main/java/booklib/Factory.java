@@ -27,7 +27,7 @@ public enum Factory {
                 if (jdbcOperations == null) {
                     MysqlDataSource ds = new MysqlDataSource();
 
-                    ds.setURL("jdbc:mysql://localhost:3306/bookLib" +
+                    ds.setURL("jdbc:mysql://localhost:3307/bookLib" +
                             "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
                     ds.setUser("bookLib");
                     ds.setPassword("bookLib");

@@ -14,4 +14,6 @@ public interface ReadingSessionDao {
     ReadingSession update(ReadingSession session);
 
     void delete(Long id);
+
+    int sumPagesForReaderAndBook(long readerId, long bookId);
 }
