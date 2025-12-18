@@ -25,6 +25,10 @@
                     onAction="#onLogout"
                     style="-fx-background-color: #c0392b;
                        -fx-text-fill: white;"/>
+
+            <ToggleButton fx:id="themeToggle"
+                          text="Dark"
+                          onAction="#onThemeToggle"/>
         </HBox>
     </top>
 

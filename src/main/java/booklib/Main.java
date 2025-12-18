@@ -15,11 +15,20 @@ public class Main extends Application {
             throw new IllegalStateException("FXML not found: LoginView.fxml");
         }
 
-        var root = FXMLLoader.load(url);
-        stage.setTitle("app");
-        stage.setScene(new Scene((Parent) root));
+        Parent root = FXMLLoader.load(url);
+        Scene scene = new Scene(root);
+
+        var cssUrl = Main.class.getResource("/styles/light-theme.css");
+        if (cssUrl == null) {
+            throw new IllegalStateException("CSS not found: /styles/light-theme.css (check resources path)");
+        }
+        scene.getStylesheets().add(cssUrl.toExternalForm());
+
+        stage.setScene(scene);
+        stage.setTitle("BookLib");
         stage.show();
     }
+
 
     public static void main(String[] args) {
         launch(args);

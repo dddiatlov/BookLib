@@ -1,0 +1,61 @@
+.root {
+    -fx-background-color: #1e1e1e;
+}
+.section-title {
+    -fx-text-fill: #eaeaea;
+    -fx-font-weight: 700;
+}
+.label { -fx-text-fill: #eaeaea; }
+
+.border-pane, .split-pane, .vbox, .hbox, .anchor-pane, .pane {
+    -fx-background-color: #1e1e1e;
+}
+.list-view {
+    -fx-background-color: #1e1e1e;
+}
+.list-view .virtual-flow,
+.list-view .virtual-flow .clipped-container,
+.list-view .virtual-flow .clipped-container .sheet {
+    -fx-background-color: #1e1e1e;
+}
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #eaeaea;
+}
+.list-cell:filled:selected,
+.list-cell:filled:selected:hover {
+    -fx-background-color: #2f2f2f;
+}
+.list-cell:filled:hover {
+    -fx-background-color: #2a2a2a;
+}
+
+.book-card {
+    -fx-background-color: #2a2a2a;
+    -fx-border-color: #3a3a3a;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 10;
+}
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: #1e1e1e;
+}
+
+.vbox {
+    -fx-background-color: #1e1e1e;
+}
+
+.split-pane:horizontal > .split-pane-divider {
+    -fx-background-color: #333333;
+}
+
+.button {
+    -fx-background-color: #333333;
+    -fx-text-fill: #eaeaea;
+    -fx-border-color: #444444;
+}
+
+.button:hover {
+    -fx-background-color: #3d3d3d;
+}

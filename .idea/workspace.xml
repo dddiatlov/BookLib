@@ -4,29 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="- logout">
+    <list default="true" id="95b1b019-8e43-48ec-af3f-549a44ce9a2f" name="Changes" comment="logout">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/styles/dark-theme.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/styles/light-theme.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Controller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Factory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Factory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/SceneSwitcher.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/SceneSwitcher.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Session.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Session.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/AddBookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/AddBookController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/Book.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/BookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/BookDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/MemoryBookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/MemoryBookDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/books/MysqlBookDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/books/MysqlBookDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/MemoryReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/MemoryReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/MysqlReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/MysqlReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/Reader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/Reader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readers/ReaderDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readers/ReaderDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/MysqlReadingSessionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/MysqlReadingSessionDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSession.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/readingSessions/ReadingSessionModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/booklib/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/booklib/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/booklib/MainView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/booklib/MainView.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,12 +52,12 @@
     &quot;assignee&quot;: &quot;dddiatlov&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/dddiatlov/BookLib.git&quot;,
-    &quot;accountId&quot;: &quot;6938e6ad-c4b0-484a-a0d2-173fba2a6874&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/dddiatlov/BookLib.git",
+    "accountId": "6a68dd36-cf5c-46ca-85d2-296340fc09b0"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -81,33 +66,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.IDELauncher.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.bookLib [clean].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;WORKINGbranch__without__duplicates&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/slurp/IdeaProjects/BookLib/src/main/resources/booklib&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.IDELauncher.executor": "Run",
+    "Application.Main.executor": "Run",
+    "Maven.bookLib [clean].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "WORKINGbranch__without__duplicates",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/slurp/IdeaProjects/BookLib/src/main/resources/booklib",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\slurp\IdeaProjects\BookLib\src\main\resources\booklib" />
@@ -152,8 +138,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.26830.84" />
+        <option value="bundled-jdk-30f59d01ecdd-cffe25b9f5b3-intellij.indexing.shared.core-IU-253.28294.334" />
+        <option value="bundled-js-predefined-d6986cc7102b-c7e53b3be11b-JavaScript-IU-253.28294.334" />
       </set>
     </attachedChunks>
   </component>
@@ -190,7 +176,8 @@
       <workItem from="1766078957846" duration="233000" />
       <workItem from="1766079216161" duration="5509000" />
       <workItem from="1766084786747" duration="964000" />
-      <workItem from="1766086025247" duration="6254000" />
+      <workItem from="1766086025247" duration="389000" />
+      <workItem from="1766092556928" duration="1612000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -280,15 +267,7 @@
       <option name="project" value="LOCAL" />
       <updated>1766086305300</updated>
     </task>
-    <task id="LOCAL-00012" summary="- logout">
-      <option name="closed" value="true" />
-      <created>1766086696369</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1766086696369</updated>
-    </task>
-    <option name="localTasksCounter" value="13" />
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -325,7 +304,6 @@
     <MESSAGE value="pre final" />
     <MESSAGE value="ревьюшки" />
     <MESSAGE value="logout" />
-    <MESSAGE value="- logout" />
-    <option name="LAST_COMMIT_MESSAGE" value="- logout" />
+    <option name="LAST_COMMIT_MESSAGE" value="logout" />
   </component>
 </project>

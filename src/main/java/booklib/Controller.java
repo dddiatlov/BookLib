@@ -33,21 +33,46 @@ public class Controller {
     private static final String STATUS_WANT = "WANT_TO_READ";
     private static final String STATUS_READING = "READING";
     private static final String STATUS_FINISHED = "FINISHED";
+    private static final String THEME_LIGHT = "/styles/light-theme.css";
+    private static final String THEME_DARK  = "/styles/dark-theme.css";
 
-    @FXML
-    private Button logoutButton;
-    @FXML
-    private VBox booksContainer;
-    @FXML
-    private ListView<ReadingSession> readingSessionsListView;
+    @FXML private Button logoutButton;
+    @FXML private VBox booksContainer;
+    @FXML private ListView<ReadingSession> readingSessionsListView;
+    @FXML private ToggleButton themeToggle;
 
     private final BookDao bookDao = Factory.INSTANCE.getBookDao();
     private final ReadingSessionDao readingSessionDao = Factory.INSTANCE.getReadingSessionDao();
+    private final java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(getClass());
 
     @FXML
     public void initialize() {
         setupReadingSessionsListCell();
         refreshMyBooksCards();
+        boolean dark = prefs.getBoolean("theme.dark", false);
+        themeToggle.setSelected(dark);
+        applyTheme(dark);
+        themeToggle.setText(dark ? "Light" : "Dark");
+    }
+
+    @FXML
+    private void onThemeToggle() {
+        boolean dark = themeToggle.isSelected();
+        prefs.putBoolean("theme.dark", dark);
+
+        applyTheme(dark);
+        themeToggle.setText(dark ? "LightLight" : "Dark");
+    }
+
+    private void applyTheme(boolean dark) {
+        var scene = themeToggle.getScene();
+        if (scene == null) return;
+
+        scene.getStylesheets().remove(getClass().getResource(THEME_LIGHT).toExternalForm());
+        scene.getStylesheets().remove(getClass().getResource(THEME_DARK).toExternalForm());
+
+        String css = dark ? THEME_DARK : THEME_LIGHT;
+        scene.getStylesheets().add(getClass().getResource(css).toExternalForm());
     }
 
     private void refreshMyBooksCards() {
@@ -100,13 +125,7 @@ public class Controller {
     private HBox createBookCard(long readerId, Book book) {
         HBox card = new HBox(10);
         card.setAlignment(Pos.CENTER_LEFT);
-        card.setStyle("""
-            -fx-padding: 10;
-            -fx-background-color: white;
-            -fx-border-color: #dcdcdc;
-            -fx-border-radius: 6;
-            -fx-background-radius: 6;
-            """);
+        card.getStyleClass().add("book-card");
 
         // Щоб картка займала всю доступну ширину (і ресайзилась разом зі списком)
         card.setMinWidth(0);
