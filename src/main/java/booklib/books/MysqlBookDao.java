@@ -139,4 +139,51 @@ public class MysqlBookDao implements BookDao {
                 bookId, readerId
         );
     }
+
+    @Override
+    public boolean isFavorite(long readerId, long bookId) {
+        Integer cnt = jdbcOperations.queryForObject(
+                "SELECT COUNT(*) FROM favorite_books WHERE reader_id = ? AND book_id = ?",
+                Integer.class,
+                readerId, bookId
+        );
+        return cnt != null && cnt > 0;
+    }
+
+    @Override
+    public void addFavorite(long readerId, long bookId) {
+        jdbcOperations.update(
+                "INSERT IGNORE INTO favorite_books (reader_id, book_id) VALUES (?, ?)",
+                readerId, bookId
+        );
+    }
+
+    @Override
+    public void removeFavorite(long readerId, long bookId) {
+        jdbcOperations.update(
+                "DELETE FROM favorite_books WHERE reader_id = ? AND book_id = ?",
+                readerId, bookId
+        );
+    }
+
+    @Override
+    public List<Book> findFavoritesByReaderId(long readerId) {
+        String sql = """
+                SELECT
+                    b.id, b.title, b.author, b.pages, b.genre, b.language, b.created_at,
+                    bs.status AS bs_status
+                FROM book b
+                JOIN favorite_books fb ON fb.book_id = b.id
+                LEFT JOIN book_status bs
+                       ON bs.book_id = b.id AND bs.reader_id = fb.reader_id
+                WHERE fb.reader_id = ?
+                ORDER BY b.title
+                """;
+
+        return jdbcOperations.query(sql, (rs, rowNum) -> {
+            Book book = Book.fromResultSet(rs);              // reads b.* columns
+            book.setStatus(rs.getString("bs_status"));       // preserves status (FINISHED stays FINISHED)
+            return book;
+        }, readerId);
+    }
 }

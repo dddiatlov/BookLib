@@ -77,6 +77,27 @@ public class MemoryBookDao implements BookDao {
         // memory mode: no-op
     }
 
+    @Override
+    public boolean isFavorite(long readerId, long bookId) {
+        // In-memory DAO does not support favorites
+        return false;
+    }
+
+    @Override
+    public void addFavorite(long readerId, long bookId) {
+        // no-op for memory implementation
+    }
+
+    @Override
+    public void removeFavorite(long readerId, long bookId) {
+        // no-op for memory implementation
+    }
+
+    @Override
+    public List<Book> findFavoritesByReaderId(long readerId) {
+        return List.of();
+    }
+
     private static String[] splitCsv(String line) {
         // Simple CSV splitter (no quoted commas handling). Enough for your dataset.
         return Arrays.stream(line.split(",", -1))

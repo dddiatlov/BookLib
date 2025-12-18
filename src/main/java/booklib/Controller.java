@@ -46,15 +46,38 @@ public class Controller {
 
     private void refreshMyBooksCards() {
         try {
-            Long readerId = Long.valueOf(Session.requireReaderId());
+            long readerId = Session.requireReaderId();
+
+            // 1) favorites
+            List<Book> favorites = bookDao.findFavoritesByReaderId(readerId);
+
+            // 2) all my books
             List<Book> books = bookDao.findByReaderId(readerId);
 
-            // keep status correct (computed from sessions)
-            for (Book b : books) {
-                syncBookStatus(readerId, b);
-            }
+            var favIds = favorites.stream().map(Book::getId).collect(java.util.stream.Collectors.toSet());
+            books.removeIf(b -> favIds.contains(b.getId()));
 
             booksContainer.getChildren().clear();
+
+            // ===== Favorites block =====
+            if (!favorites.isEmpty()) {
+                Label favHeader = new Label("Favorites");
+                favHeader.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 6 0;");
+                booksContainer.getChildren().add(favHeader);
+
+                for (Book b : favorites) {
+                    booksContainer.getChildren().add(createBookCard(readerId, b));
+                }
+
+                Separator sep = new Separator();
+                sep.setStyle("-fx-padding: 10 0 10 0;");
+                booksContainer.getChildren().add(sep);
+            }
+
+            // ===== My Books block =====
+            Label myHeader = new Label("My Books");
+            myHeader.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 6 0;");
+            booksContainer.getChildren().add(myHeader);
 
             for (Book book : books) {
                 booksContainer.getChildren().add(createBookCard(readerId, book));
@@ -68,7 +91,7 @@ public class Controller {
         }
     }
 
-    private HBox createBookCard(Long readerId, Book book) {
+    private HBox createBookCard(long readerId, Book book) {
         HBox card = new HBox(10);
         card.setStyle("""
                 -fx-padding: 10;
@@ -102,7 +125,31 @@ public class Controller {
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        card.getChildren().addAll(title, statusLabel, spacer, sessionsBtn, addSessionBtn, deleteBtn);
+        boolean fav = bookDao.isFavorite(readerId, book.getId());
+
+        Button favBtn = new Button(fav ? "★" : "☆");
+        favBtn.setMinWidth(35);
+        favBtn.setPrefWidth(35);
+        favBtn.setMaxWidth(35);
+
+        favBtn.setOnAction(e -> {
+            try {
+                boolean makeFav = "☆".equals(favBtn.getText());
+                if (makeFav) {
+                    bookDao.addFavorite(readerId, book.getId());
+                    favBtn.setText("★");
+                } else {
+                    bookDao.removeFavorite(readerId, book.getId());
+                    favBtn.setText("☆");
+                }
+                refreshMyBooksCards();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alerts.error("DB error", ex.getMessage());
+            }
+        });
+
+        card.getChildren().addAll(title, statusLabel, spacer, favBtn, sessionsBtn, addSessionBtn, deleteBtn);
         return card;
     }
 
@@ -115,7 +162,7 @@ public class Controller {
     }
 
     private void deleteBook(Book book) {
-        Long readerId = Long.valueOf(Session.requireReaderId());
+        long readerId = Long.valueOf(Session.requireReaderId());
 
         var confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 "Delete this book from your list?\n\n" + book.getTitle(),
@@ -314,7 +361,7 @@ public class Controller {
     public void onImportCsv() {
         try (InputStream in = getClass().getResourceAsStream("/booklib/books.csv")) {
             if (in == null) {
-                Alerts.error("CSV import", "Resource /booklib/books.csv not found (check src/main/resources/booklib/books.csv)");
+                Alerts.error("CSV import", "Resource /booklib/books.csv not found");
                 return;
             }
 

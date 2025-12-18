@@ -18,4 +18,12 @@ public interface BookDao {
     void addBookForReader(Long bookId, Long readerId, String status);
 
     void removeBookForReader(Long bookId, Long readerId);
+
+    boolean isFavorite(long readerId, long bookId);
+
+    void addFavorite(long readerId, long bookId);
+
+    void removeFavorite(long readerId, long bookId);
+
+    List<Book> findFavoritesByReaderId(long readerId);
 }
