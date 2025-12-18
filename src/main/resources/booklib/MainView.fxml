@@ -49,6 +49,9 @@
                             text="+ Add Book"
                             onAction="#onAddBook"/>
 
+                    <Button text="Logout" onAction="#onLogout"/>
+
+
                     <Button text="Import CSV"
                             onAction="#onImportCsv"/>
 

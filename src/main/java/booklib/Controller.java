@@ -10,8 +10,10 @@ import booklib.books.BookDao;
 import booklib.readingSessions.ReadingSession;
 import booklib.readingSessions.ReadingSessionController;
 import booklib.readingSessions.ReadingSessionDao;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -31,9 +33,12 @@ public class Controller {
     private static final String STATUS_READING = "READING";
     private static final String STATUS_FINISHED = "FINISHED";
 
-    @FXML private Button logoutButton;
-    @FXML private VBox booksContainer;
-    @FXML private ListView<ReadingSession> readingSessionsListView;
+    @FXML
+    private Button logoutButton;
+    @FXML
+    private VBox booksContainer;
+    @FXML
+    private ListView<ReadingSession> readingSessionsListView;
 
     private final BookDao bookDao = Factory.INSTANCE.getBookDao();
     private final ReadingSessionDao readingSessionDao = Factory.INSTANCE.getReadingSessionDao();
@@ -378,17 +383,9 @@ public class Controller {
     }
 
     @FXML
-    public void onLogout() {
+    public void onLogout(ActionEvent event) {
         Session.clear();
-
-        try {
-            SceneSwitcher.switchTo(
-                    "/booklib/LoginView.fxml",
-                    logoutButton
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            Alerts.error("Logout failed", "Unable to return to login screen.");
-        }
+        Node source = (Node) event.getSource();
+        SceneSwitcher.switchTo("/booklib/LoginView.fxml", source);
     }
 }
