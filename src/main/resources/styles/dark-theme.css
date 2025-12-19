@@ -39,7 +39,7 @@
 }
 .scroll-pane,
 .scroll-pane > .viewport {
-    -fx-background-color: #1e1e1e;
+    -fx-background-color: transparent;
 }
 
 .vbox {

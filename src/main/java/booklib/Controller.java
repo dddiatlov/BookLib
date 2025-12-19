@@ -36,10 +36,13 @@ public class Controller {
     private static final String THEME_LIGHT = "/styles/light-theme.css";
     private static final String THEME_DARK  = "/styles/dark-theme.css";
 
-    @FXML private Button logoutButton;
     @FXML private VBox booksContainer;
     @FXML private ListView<ReadingSession> readingSessionsListView;
     @FXML private ToggleButton themeToggle;
+    @FXML private VBox favoritesBox;
+    @FXML private VBox myBooksBox;
+    @FXML private Label favoritesHeader;
+    @FXML private Separator favoritesSeparator;
 
     private final BookDao bookDao = Factory.INSTANCE.getBookDao();
     private final ReadingSessionDao readingSessionDao = Factory.INSTANCE.getReadingSessionDao();
@@ -49,10 +52,12 @@ public class Controller {
     public void initialize() {
         setupReadingSessionsListCell();
         refreshMyBooksCards();
-        boolean dark = prefs.getBoolean("theme.dark", false);
-        themeToggle.setSelected(dark);
-        applyTheme(dark);
-        themeToggle.setText(dark ? "Light" : "Dark");
+
+        themeToggle.setSelected(false);
+        themeToggle.setText("Dark");
+
+        prefs.putBoolean("theme.dark", false);
+        javafx.application.Platform.runLater(() -> applyTheme(false));
     }
 
     @FXML
@@ -79,41 +84,32 @@ public class Controller {
         try {
             long readerId = Session.requireReaderId();
 
-            // 1) favorites
             List<Book> favorites = bookDao.findFavoritesByReaderId(readerId);
-
-            // 2) all my books
             List<Book> books = bookDao.findByReaderId(readerId);
 
-            var favIds = favorites.stream().map(Book::getId).collect(java.util.stream.Collectors.toSet());
+            var favIds = favorites.stream()
+                    .map(Book::getId)
+                    .collect(java.util.stream.Collectors.toSet());
             books.removeIf(b -> favIds.contains(b.getId()));
 
-            booksContainer.getChildren().clear();
+            favoritesBox.getChildren().clear();
+            myBooksBox.getChildren().clear();
 
-            // ===== Favorites block =====
-            if (!favorites.isEmpty()) {
-                Label favHeader = new Label("Favorites");
-                favHeader.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 6 0;");
-                booksContainer.getChildren().add(favHeader);
+            boolean hasFavs = !favorites.isEmpty();
+            favoritesHeader.setVisible(hasFavs);
+            favoritesHeader.setManaged(hasFavs);
 
-                for (Book b : favorites) {
-                    booksContainer.getChildren().add(createBookCard(readerId, b));
-                }
+            favoritesBox.setVisible(hasFavs);
+            favoritesBox.setManaged(hasFavs);
 
-                Separator sep = new Separator();
-                sep.setStyle("-fx-padding: 10 0 10 0;");
-                booksContainer.getChildren().add(sep);
+            favoritesSeparator.setVisible(hasFavs);
+            favoritesSeparator.setManaged(hasFavs);
+
+            if (hasFavs) {
+                for (Book b : favorites) favoritesBox.getChildren().add(createBookCard(readerId, b));
             }
 
-            // ===== My Books block =====
-            Label myHeader = new Label("My Books");
-            myHeader.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 6 0;");
-            booksContainer.getChildren().add(myHeader);
-
-            for (Book book : books) {
-                booksContainer.getChildren().add(createBookCard(readerId, book));
-            }
-
+            for (Book b : books) myBooksBox.getChildren().add(createBookCard(readerId, b));
             readingSessionsListView.getItems().clear();
 
         } catch (Exception e) {
@@ -127,11 +123,9 @@ public class Controller {
         card.setAlignment(Pos.CENTER_LEFT);
         card.getStyleClass().add("book-card");
 
-        // Щоб картка займала всю доступну ширину (і ресайзилась разом зі списком)
         card.setMinWidth(0);
         card.setMaxWidth(Double.MAX_VALUE);
         if (booksContainer != null) {
-            // мінус padding контейнера (підкоригуйте, якщо у вас інші відступи)
             card.prefWidthProperty().bind(booksContainer.widthProperty().subtract(20));
         }
 
@@ -237,19 +231,13 @@ public class Controller {
         }
     }
 
-    /* =========================
-       READING SESSIONS
-       ========================= */
-
     private void loadReadingSessionsForBook(Book book) {
         try {
             long readerId = Session.requireReaderId();
             var sessions = readingSessionDao.findByReaderIdAndBookId(readerId, book.getId());
             readingSessionsListView.getItems().setAll(sessions);
 
-            // also keep status synced whenever sessions are viewed
             syncBookStatus(readerId, book);
-
         } catch (Exception e) {
             e.printStackTrace();
             Alerts.error("DB error", e.getMessage());
@@ -315,7 +303,6 @@ public class Controller {
                         }
                     }
                 });
-
                 setGraphic(box);
             }
 
@@ -342,7 +329,6 @@ public class Controller {
             st.setScene(new Scene(root));
             st.showAndWait();
 
-            // after dialog: recalc status + refresh UI + reload sessions
             long readerId = Session.requireReaderId();
             syncBookStatus(readerId, book);
             refreshMyBooksCards();
@@ -354,9 +340,6 @@ public class Controller {
         }
     }
 
-    /**
-     * Computes and persists correct status for (reader, book) based on reading sessions.
-     */
     private void syncBookStatus(long readerId, Book book) {
         if (book == null || book.getId() == null) return;
 
@@ -368,10 +351,7 @@ public class Controller {
         else if (totalRead >= totalPages && totalPages > 0) status = STATUS_FINISHED;
         else status = STATUS_READING;
 
-        // persist into book_status (your method is UPSERT)
         bookDao.addBookForReader(book.getId(), readerId, status);
-
-        // keep object consistent for UI
         book.setStatus(status);
     }
 
@@ -384,10 +364,6 @@ public class Controller {
         int totalRead = readingSessionDao.sumPagesForReaderAndBook(readerId, book.getId());
         return totalRead >= totalPages;
     }
-
-    /* =========================
-       BOOKS
-       ========================= */
 
     @FXML
     public void onAddBook() {

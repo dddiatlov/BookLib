@@ -21,10 +21,8 @@ class MysqlBookDaoTest {
         TestDb.runSchema(jdbc);
     }
 
-
     @BeforeEach
     void setUp() {
-        // чистим в правильном порядке из-за FK
         jdbc.update("DELETE FROM reading_session");
         jdbc.update("DELETE FROM book_status");
         jdbc.update("DELETE FROM favorite_books");
@@ -34,7 +32,6 @@ class MysqlBookDaoTest {
         dao = new MysqlBookDao(jdbc);
     }
 
-    // ---------- helpers ----------
     private long insertReader(String name) {
         jdbc.update("INSERT INTO reader(name, password_hash) VALUES(?,?)", name, "h");
         Long id = jdbc.queryForObject("SELECT id FROM reader WHERE name=?", Long.class, name);
@@ -51,8 +48,6 @@ class MysqlBookDaoTest {
         assertNotNull(id);
         return id;
     }
-
-    // ---------- tests ----------
 
     @Test
     void add_shouldGenerateId_andFindById() {
@@ -154,10 +149,7 @@ class MysqlBookDaoTest {
         long readerId = insertReader("r1");
         long book1 = insertBook("b1");
 
-        // добавили в избранное
         dao.addFavorite(readerId, book1);
-
-        // добавили в "мои книги" со статусом
         dao.addBookForReader(book1, readerId, "READING");
 
         var favs = dao.findFavoritesByReaderId(readerId);
@@ -167,14 +159,10 @@ class MysqlBookDaoTest {
 
     @Test
     void loadFromCsv_smokeTest() throws Exception {
-        // ⚠️ Это "smoke test": если формат CSV у тебя другой — подгони содержимое файла под MemoryBookDao.
-        // Главное: метод должен отработать и данные должны появиться в таблице book.
 
         File tmp = Files.createTempFile("books", ".csv").toFile();
         tmp.deleteOnExit();
 
-        // Популярный вариант: CSV с заголовком, разделитель запятая.
-        // Если у тебя ; или другой порядок — поменяй строку.
         String csv =
                 "id,title,author,pages,genre,language,createdAt\n" +
                 "1,CSV Book,CSV Author,111,Drama,en,2025-01-01T10:00:00\n";
@@ -183,7 +171,6 @@ class MysqlBookDaoTest {
         int loaded = dao.loadFromCsv(tmp);
 
         assertTrue(loaded >= 0);
-        // хотя бы одна книга должна быть
         assertTrue(jdbc.queryForObject("SELECT COUNT(*) FROM book", Integer.class) >= 1);
     }
 }

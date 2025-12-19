@@ -8,16 +8,12 @@ import java.nio.charset.StandardCharsets;
 
 public final class TestDb {
 
-    private TestDb() {
-    }
+    private TestDb() { ; }
 
-    // ⚠️ ВАЖНО: это твой порт из Factory (меняй если у тебя другой)
     private static final String URL =
             "jdbc:mysql://localhost:3307/bookLib?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-
-
     private static final String USER = "bookLib";
-    private static final String PASS = "bookLib"; // если у тебя другое — поменяй
+    private static final String PASS = "bookLib";
 
     public static JdbcTemplate jdbc() {
         return new JdbcTemplate(dataSource());

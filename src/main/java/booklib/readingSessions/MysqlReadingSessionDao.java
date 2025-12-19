@@ -12,15 +12,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * РЕАЛИЗАЦИЯ ReadingSessionDao ДЛЯ РАБОТЫ С БАЗОЙ ДАННЫХ MySQL
- * Использует Spring JDBC для выполнения SQL запросов.
- */
 public class MysqlReadingSessionDao implements ReadingSessionDao {
 
     private final JdbcOperations jdbcOperations;
 
-    // SQL запрос для выборки сессий чтения с соединением таблиц
     private static final String SELECT_QUERY =
             "SELECT " +
                     "rs.id AS rs_id, rs.pages_read AS rs_pages_read, rs.duration_minutes AS rs_duration_minutes, rs.created_at AS rs_created_at, " +
@@ -34,12 +29,6 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
         this.jdbcOperations = jdbcOperations;
     }
 
-    /**
-     * ЭКСТРАКТОР ДАННЫХ для преобразования ResultSet в список ReadingSession
-     *
-     * Особенность: запрос возвращает данные из трех таблиц (reading_session, reader, book).
-     * Используются HashMap для избежания дублирования объектов при обработке нескольких строк.
-     */
     private final ResultSetExtractor<List<ReadingSession>> resultSetExtractor = rs -> {
         var sessions = new ArrayList<ReadingSession>();
         var processedSessions = new HashMap<Long, ReadingSession>();
@@ -50,7 +39,6 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
             long id = rs.getLong("rs_id");
             var session = processedSessions.get(id);
             if (session == null) {
-                // Создаем объект сессии чтения, используя алиасы для полей reading_session
                 session = ReadingSession.fromResultSet(rs, "rs_");
                 processedSessions.put(id, session);
                 sessions.add(session);
@@ -59,7 +47,6 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
             long readerId = rs.getLong("r_id");
             var reader = processedReaders.get(readerId);
             if (reader == null) {
-                // Создаем объект читателя, используя алиасы для полей reader
                 reader = Reader.fromResultSet(rs, "r_");
                 processedReaders.put(readerId, reader);
             }
@@ -67,7 +54,6 @@ public class MysqlReadingSessionDao implements ReadingSessionDao {
             long bookId = rs.getLong("b_id");
             var book = processedBooks.get(bookId);
             if (book == null) {
-                // Создаем объект книги, используя алиасы для полей book
                 book = Book.fromResultSet(rs, "b_");
                 processedBooks.put(bookId, book);
             }

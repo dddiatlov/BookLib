@@ -22,8 +22,6 @@ class MysqlReadingSessionDaoTest {
         TestDb.runSchema(jdbc);
     }
 
-
-
     @BeforeEach
     void setUp() {
         jdbc.update("DELETE FROM reading_session");
@@ -35,7 +33,6 @@ class MysqlReadingSessionDaoTest {
         dao = new MysqlReadingSessionDao(jdbc);
     }
 
-    // ---------- helpers ----------
     private Reader mkReader(String name) {
         jdbc.update("INSERT INTO reader(name, password_hash) VALUES(?,?)", name, "h");
         Long id = jdbc.queryForObject("SELECT id FROM reader WHERE name=?", Long.class, name);
@@ -66,7 +63,6 @@ class MysqlReadingSessionDaoTest {
         return b;
     }
 
-    // ---------- tests ----------
     @Test
     void create_and_findById() {
         Reader r = mkReader("r1");

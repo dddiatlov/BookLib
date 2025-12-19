@@ -35,17 +35,17 @@
     <!-- MAIN CONTENT -->
     <center>
         <SplitPane dividerPositions="0.62"
-                   style="-fx-padding: 12; -fx-background-color: #f3f3f3;"
+                   style="-fx-padding: 12;"
                    BorderPane.alignment="CENTER">
 
-            <!-- LEFT: BOOKS -->
+        <!-- LEFT: BOOKS -->
             <VBox spacing="10" minWidth="320">
 
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label fx:id="myBooksLabel"
                            text="Books"
-
-                           style="-fx-font-size: 16px; -fx-font-weight: bold;-fx-text-fill: darkblue"/>
+                           styleClass="section-title"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
                     <Button fx:id="addBookButton"
                             text="+ Add Book"
@@ -55,19 +55,42 @@
                             onAction="#onImportCsv"/>
                 </HBox>
 
+                <!-- SINGLE ScrollPane (no split) -->
                 <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox fx:id="booksContainer"
-                              spacing="15"
-                              style="-fx-background-color: darkgrey; -fx-padding: 10;"/>
+                        <VBox spacing="10" style="-fx-padding: 10;">
+
+                            <!-- Favorites section -->
+                            <Label fx:id="favoritesHeader"
+                                   text="Favorites"
+                                   visible="false" managed="false"
+                                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 6 0;"/>
+
+                            <VBox fx:id="favoritesBox"
+                                  spacing="10"
+                                  visible="false" managed="false"/>
+
+                            <Separator fx:id="favoritesSeparator"
+                                       visible="false" managed="false"
+                                       style="-fx-padding: 10 0 10 0;"/>
+
+                            <!-- My Books section -->
+                            <Label text="My Books"
+                                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 0 0 6 0;"/>
+
+                            <VBox fx:id="myBooksBox" spacing="10"/>
+
+                        </VBox>
                     </content>
                 </ScrollPane>
+
             </VBox>
 
             <!-- RIGHT: READING SESSIONS -->
             <VBox spacing="10" minWidth="125">
                 <Label text="Reading Sessions"
-                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 0 10; -fx-text-fill: darkblue"/>
+                       styleClass="section-title"
+                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 0 0 10;"/>
 
                 <ListView fx:id="readingSessionsListView" VBox.vgrow="ALWAYS"/>
             </VBox>

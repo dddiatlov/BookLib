@@ -17,8 +17,6 @@ class MysqlReaderDaoTest {
         TestDb.runSchema(jdbc);
     }
 
-
-
     @BeforeEach
     void setUp() {
         jdbc.update("DELETE FROM reading_session");
