@@ -43,7 +43,7 @@
 
                 <HBox spacing="12" alignment="CENTER_LEFT">
                     <Label fx:id="myBooksLabel"
-                           text="My Books"
+                           text="Books"
 
                            style="-fx-font-size: 16px; -fx-font-weight: bold;-fx-text-fill: darkblue"/>
 
