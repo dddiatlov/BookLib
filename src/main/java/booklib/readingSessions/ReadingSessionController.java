@@ -67,6 +67,7 @@ public class ReadingSessionController {
             }
 
             int remaining = remainingPagesForThisBook();
+            int currentPage = book.getPages() - remaining;
 
             if (remaining <= 0) {
                 pagesReadField.setText("0");
@@ -83,7 +84,7 @@ public class ReadingSessionController {
 
             pagesReadField.setTextFormatter(rangedIntFormatter(1, remaining));
             if (limitLabel != null) {
-                limitLabel.setText("You can add at most: " + remaining + " pages in this session.");
+                limitLabel.setText("Current progress: " + currentPage + " pages." + " " + "Finished in " + remaining + " pages.");
             }
             clampFieldToRange(pagesReadField, 1, remaining);
         }
