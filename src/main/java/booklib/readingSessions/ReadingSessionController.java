@@ -40,10 +40,15 @@ public class ReadingSessionController {
 
         if (session != null) {
             if (datePicker != null && session.getCreatedAt() != null) datePicker.setValue(session.getCreatedAt().toLocalDate());
-            if (pagesReadField != null) pagesReadField.setText(String.valueOf(session.getPagesRead()));
             if (durationField != null) durationField.setText(String.valueOf(session.getDurationMinutes()));
         }
         applyInputConstraints();
+
+        if (session != null && pagesReadField != null && book != null) {
+            int currentPageBefore = currentPageBeforeThisSession();
+            int finishedPage = currentPageBefore + Math.max(0, session.getPagesRead());
+            pagesReadField.setText(String.valueOf(finishedPage));
+        }
     }
 
     @FXML
@@ -59,35 +64,43 @@ public class ReadingSessionController {
             durationField.setTextFormatter(digitsOnlyFormatter());
         }
 
-        if (pagesReadField != null) {
-            if (book == null) {
-                pagesReadField.setTextFormatter(digitsOnlyFormatter());
-                if (limitLabel != null) limitLabel.setText("");
-                return;
-            }
-
-            int remaining = remainingPagesForThisBook();
-            int currentPage = book.getPages() - remaining;
-
-            if (remaining <= 0) {
-                pagesReadField.setText("0");
-                pagesReadField.setDisable(true);
-                saveButton.setDisable(true);
-                if (limitLabel != null) {
-                    limitLabel.setText("No pages remaining. Book is already finished.");
-                }
-                return;
-            }
-
-            pagesReadField.setDisable(false);
-            saveButton.setDisable(false);
-
-            pagesReadField.setTextFormatter(rangedIntFormatter(1, remaining));
-            if (limitLabel != null) {
-                limitLabel.setText("Current progress: " + currentPage + " pages." + " " + "Finished in " + remaining + " pages.");
-            }
-            clampFieldToRange(pagesReadField, 1, remaining);
+        if (book == null) {
+            pagesReadField.setTextFormatter(digitsOnlyFormatter());
+            if (limitLabel != null) limitLabel.setText("");
+            return;
         }
+
+        int remaining = remainingPagesForThisBook();
+        int currentPage = currentPageBeforeThisSession();
+
+        if (remaining <= 0) {
+            pagesReadField.setText("");
+            pagesReadField.setDisable(true);
+            saveButton.setDisable(true);
+            if (limitLabel != null) {
+                limitLabel.setText("No pages remaining. Book is already finished.");
+            }
+            return;
+        }
+
+        pagesReadField.setDisable(false);
+        saveButton.setDisable(false);
+
+        pagesReadField.setTextFormatter(digitsOnlyFormatter());
+
+        if (limitLabel != null) {
+            limitLabel.setText("Current progress: " + currentPage + " pages." + " " + "Book total: " + book.getPages() + " pages.");
+        }
+    }
+
+    private int currentPageBeforeThisSession() {
+        if (book == null) return 0;
+
+        int bookPages = Math.max(0, book.getPages());
+        int remaining = remainingPagesForThisBook();
+        int current = bookPages - remaining;
+
+        return Math.max(0, Math.min(current, bookPages));
     }
 
     private int remainingPagesForThisBook() {
@@ -111,35 +124,6 @@ public class ReadingSessionController {
         });
     }
 
-    private TextFormatter<String> rangedIntFormatter(int min, int max) {
-        return new TextFormatter<>(change -> {
-            String t = change.getControlNewText();
-            if (t.isBlank()) return change;
-            if (!t.matches("\\d{0,9}")) return null;
-
-            try {
-                int v = Integer.parseInt(t);
-                if (v < min || v > max) return null;
-            } catch (NumberFormatException ex) {
-                return null;
-            }
-            return change;
-        });
-    }
-
-    private void clampFieldToRange(TextField field, int min, int max) {
-        String t = field.getText();
-        if (t == null || t.isBlank()) return;
-        try {
-            int v = Integer.parseInt(t.trim());
-            if (v < min) v = min;
-            if (v > max) v = max;
-            field.setText(String.valueOf(v));
-        } catch (Exception ignored) {
-            field.clear();
-        }
-    }
-
     @FXML
     private void onSave() {
         if (book == null) {
@@ -153,14 +137,22 @@ public class ReadingSessionController {
             return;
         }
 
-        int pages;
+        String finishedPageText = pagesReadField.getText();
+        String minutesText = durationField.getText();
+
+        if (finishedPageText == null || finishedPageText.isBlank()) {
+            showError("Please enter the page you finished on.");
+            return;
+        }
+
+        int finishedPage;
         int minutes;
 
         try {
-            pages = Integer.parseInt(pagesReadField.getText().trim());
-            minutes = Integer.parseInt(durationField.getText().trim());
+            finishedPage = Integer.parseInt(finishedPageText.trim());
+            minutes = Integer.parseInt(minutesText.trim());
         } catch (Exception e) {
-            showError("Pages read and duration must be whole numbers.");
+            showError("Page and duration must be whole numbers.");
             return;
         }
 
@@ -174,8 +166,19 @@ public class ReadingSessionController {
             showError("Book is already finished. You cannot add more pages.");
             return;
         }
-        if (pages < 1 || pages > remaining) {
-            showError("You can add at most " + remaining + " pages for this book.");
+
+        int currentPageBefore = currentPageBeforeThisSession();
+        int minFinishedPage = currentPageBefore + 1;
+        int maxFinishedPage = Math.max(minFinishedPage, book.getPages());
+
+        if (finishedPage < minFinishedPage || finishedPage > maxFinishedPage) {
+            showError("Finished page must be between " + minFinishedPage + " and " + maxFinishedPage + ".");
+            return;
+        }
+
+        int pagesReadThisSession = finishedPage - currentPageBefore;
+        if (pagesReadThisSession < 1) {
+            showError("Finished page must be after your current progress.");
             return;
         }
 
@@ -189,13 +192,13 @@ public class ReadingSessionController {
                 ReadingSession session = new ReadingSession();
                 session.setBook(book);
                 session.setReader(r);
-                session.setPagesRead(pages);
+                session.setPagesRead(pagesReadThisSession);
                 session.setDurationMinutes(minutes);
                 session.setCreatedAt(createdAt);
 
                 readingSessionDao.create(session);
             } else {
-                editingSession.setPagesRead(pages);
+                editingSession.setPagesRead(pagesReadThisSession);
                 editingSession.setDurationMinutes(minutes);
                 editingSession.setCreatedAt(createdAt);
                 editingSession.setReader(r);

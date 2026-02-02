@@ -20,7 +20,7 @@
            text=""
            style="-fx-text-fill: #666666; -fx-font-size: 11px;"/>
 
-    <TextField fx:id="pagesReadField" promptText="Pages read"/>
+    <TextField fx:id="pagesReadField" promptText="Finished on page..."/>
     <TextField fx:id="durationField" promptText="Duration (minutes)"/>
     <DatePicker fx:id="datePicker"/>
 
